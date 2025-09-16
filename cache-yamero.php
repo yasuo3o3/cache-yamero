@@ -112,9 +112,9 @@ class Cache_Yamero {
 			check_admin_referer( 'of_cache_yamero_settings' );
 
 			update_option( 'of_cache_yamero_enabled', isset( $_POST['of_cache_yamero_enabled'] ) ? 1 : 0 );
-			update_option( 'of_cache_yamero_scope', sanitize_text_field( $_POST['of_cache_yamero_scope'] ) );
-			update_option( 'of_cache_yamero_start_datetime', sanitize_text_field( $_POST['of_cache_yamero_start_datetime'] ) );
-			update_option( 'of_cache_yamero_end_datetime', sanitize_text_field( $_POST['of_cache_yamero_end_datetime'] ) );
+			update_option('of_cache_yamero_scope', isset($_POST['of_cache_yamero_scope']) ? sanitize_text_field( wp_unslash( $_POST['of_cache_yamero_scope'] ) ) : '');
+			update_option('of_cache_yamero_start_datetime', isset($_POST['of_cache_yamero_start_datetime']) ? sanitize_text_field( wp_unslash( $_POST['of_cache_yamero_start_datetime'] ) ) : '');
+			update_option('of_cache_yamero_end_datetime', isset($_POST['of_cache_yamero_end_datetime']) ? sanitize_text_field( wp_unslash( $_POST['of_cache_yamero_end_datetime'] ) ) : '');
 			update_option( 'of_cache_yamero_get_form_support', isset( $_POST['of_cache_yamero_get_form_support'] ) ? 1 : 0 );
 			update_option( 'of_cache_yamero_url_cleanup', isset( $_POST['of_cache_yamero_url_cleanup'] ) ? 1 : 0 );
 
