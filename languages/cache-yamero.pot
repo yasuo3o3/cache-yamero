@@ -1,0 +1,97 @@
+# Cache Yamero
+# Copyright (C) 2024 Netservice
+# This file is distributed under the GPL v2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Cache Yamero 1.0.0\n"
+"Report-Msgid-Bugs-To: https://netservice.jp/\n"
+"POT-Creation-Date: 2024-09-16 12:00+0900\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"X-Generator: manual\n"
+
+#: cache-yamero.php:77
+msgid "Cache Yamero 設定"
+msgstr ""
+
+#: cache-yamero.php:78
+msgid "Cache Yamero"
+msgstr ""
+
+#: cache-yamero.php:91
+msgid "このページにアクセスする権限がありません。"
+msgstr ""
+
+#: cache-yamero.php:103
+msgid "設定を保存しました。"
+msgstr ""
+
+#: cache-yamero.php:118
+msgid "開発時のキャッシュを無効化するためのプラグインです。人の操作時のみ ?cache-yamero=YYYYMMDDHHmmss をURLに付与します。"
+msgstr ""
+
+#: cache-yamero.php:125
+msgid "有効化"
+msgstr ""
+
+#: cache-yamero.php:129
+msgid "Cache Yamero を有効にする"
+msgstr ""
+
+#: cache-yamero.php:134
+msgid "適用範囲"
+msgstr ""
+
+#: cache-yamero.php:137
+msgid "管理者のみ"
+msgstr ""
+
+#: cache-yamero.php:140
+msgid "すべての訪問者"
+msgstr ""
+
+#: cache-yamero.php:142
+msgid "「管理者のみ」は管理権限を持つユーザーのみに適用されます。"
+msgstr ""
+
+#: cache-yamero.php:147
+msgid "有効期間"
+msgstr ""
+
+#: cache-yamero.php:149
+msgid "開始日時:"
+msgstr ""
+
+#: cache-yamero.php:152
+msgid "終了日時:"
+msgstr ""
+
+#: cache-yamero.php:154
+msgid "空白の場合は期間制限なしです。"
+msgstr ""
+
+#: cache-yamero.php:159
+msgid "オプション"
+msgstr ""
+
+#: cache-yamero.php:164
+msgid "GETフォーム対応"
+msgstr ""
+
+#: cache-yamero.php:166
+msgid "GETフォーム送信時にもキャッシュ無効化パラメータを付与します。"
+msgstr ""
+
+#: cache-yamero.php:172
+msgid "URLクリーンアップ"
+msgstr ""
+
+#: cache-yamero.php:174
+msgid "表示後にアドレスバーからcache-yameroパラメータを除去します。"
+msgstr ""
