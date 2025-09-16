@@ -92,12 +92,29 @@ class Cache_Yamero {
 	 * 管理画面初期化
 	 */
 	public function of_admin_init() {
-		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_enabled' );
-		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_scope' );
-		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_start_datetime' );
-		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_end_datetime' );
-		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_get_form_support' );
-		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_url_cleanup' );
+		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_enabled', array(
+			'sanitize_callback' => 'absint',
+		) );
+
+		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_scope', array(
+			'sanitize_callback' => 'sanitize_text_field',
+		) );
+
+		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_start_datetime', array(
+			'sanitize_callback' => 'sanitize_text_field',
+		) );
+
+		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_end_datetime', array(
+			'sanitize_callback' => 'sanitize_text_field',
+		) );
+
+		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_get_form_support', array(
+			'sanitize_callback' => 'absint',
+		) );
+
+		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_url_cleanup', array(
+			'sanitize_callback' => 'absint',
+		) );
 	}
 
 	/**
