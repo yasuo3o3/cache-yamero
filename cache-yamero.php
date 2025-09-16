@@ -3,19 +3,19 @@
  * Cache Yamero
  *
  * @package           CacheYamero
- * @author            Netservice
- * @copyright         2024 Netservice
+ * @author            yasuo3o3
+ * @copyright         2024 yasuo3o3
  * @license           GPL-2.0-or-later
  *
  * @wordpress-plugin
  * Plugin Name:       Cache Yamero
- * Plugin URI:        https://netservice.jp/
+ * Plugin URI:        https://yasuo-o.xyz/
  * Description:       人の操作時だけページ遷移URLに ?cache-yamero=YYYYMMDDHHmmss を付与してキャッシュを無効化する開発補助ツール。DOMは汚さない。公開前後の一時運用にも対応。
  * Version:           1.0.0
  * Requires at least: 6.0
  * Requires PHP:      7.4
- * Author:            Netservice
- * Author URI:        https://netservice.jp/
+ * Author:            yasuo3o3
+ * Author URI:        https://yasuo-o.xyz/
  * Text Domain:       cache-yamero
  * License:           GPL v2 or later
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt

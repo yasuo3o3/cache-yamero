@@ -1,10 +1,10 @@
 # Cache Yamero
-# Copyright (C) 2024 Netservice
+# Copyright (C) 2024 yasuo3o3
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
 "Project-Id-Version: Cache Yamero 1.0.0\n"
-"Report-Msgid-Bugs-To: https://netservice.jp/\n"
+"Report-Msgid-Bugs-To: https://yasuo-o.xyz/\n"
 "POT-Creation-Date: 2024-09-16 12:00+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"

@@ -1,5 +1,5 @@
 === Cache Yamero ===
-Contributors: netservice
+Contributors: yasuo3o3
 Tags: cache, development, debug, refresh
 Requires at least: 6.0
 Tested up to: 6.8

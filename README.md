@@ -103,8 +103,8 @@ GPLv2 or later
 
 ## Author / 作者
 
-Netservice
-https://netservice.jp/
+yasuo3o3
+https://yasuo-o.xyz/
 
 ---
 
