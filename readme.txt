@@ -8,9 +8,8 @@ Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Stop cache from messing with your CSS/HTML reloads during development.  
-Add a unique timestamp query (`?cache-yamero=YYYYMMDDHHmmss`) to links on click,  
-forcing browsers to always fetch the fresh page.
+Stop cache from interfering with CSS/HTML reloads by appending a timestamp query to links during development.
+
 
 == Description ==
 
