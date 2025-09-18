@@ -41,10 +41,11 @@ class Cache_Yamero {
 	 * プラグイン初期化
 	 */
 	public function __construct() {
-		add_action( 'init', array( $this, 'of_init' ) );
-		add_action( 'admin_menu', array( $this, 'of_add_admin_menu' ) );
-		add_action( 'admin_init', array( $this, 'of_admin_init' ) );
-		add_action( 'wp_enqueue_scripts', array( $this, 'of_enqueue_scripts' ) );
+		add_action( 'init', [ $this, 'of_init' ] );
+		add_action( 'admin_menu', [ $this, 'of_add_admin_menu' ] );
+		add_action( 'admin_init', [ $this, 'of_admin_init' ] );
+		add_action( 'wp_enqueue_scripts', [ $this, 'of_enqueue_scripts' ] );
+		add_action( 'plugins_loaded', [ $this, 'load_textdomain' ] );
 		$this->of_init_resource_hooks();
 	}
 
@@ -60,7 +61,7 @@ class Cache_Yamero {
 	 * デフォルトオプションを設定
 	 */
 	private function of_set_default_options() {
-		$defaults = array(
+		$defaults = [
 			'enabled'           => false,
 			'scope'             => 'admin_only',
 			'start_datetime'    => '',
@@ -70,7 +71,7 @@ class Cache_Yamero {
 			'apply_css'         => true,
 			'apply_js'          => true,
 			'apply_images'      => true,
-		);
+		];
 
 		foreach ( $defaults as $key => $value ) {
 			if ( false === get_option( 'of_cache_yamero_' . $key ) ) {
@@ -88,7 +89,7 @@ class Cache_Yamero {
 			__( 'Cache Yamero', 'cache-yamero' ),
 			'manage_options',
 			'cache-yamero',
-			array( $this, 'of_admin_page' )
+			[ $this, 'of_admin_page' ]
 		);
 	}
 
@@ -96,29 +97,29 @@ class Cache_Yamero {
 	 * 管理画面初期化
 	 */
 	public function of_admin_init() {
-		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_enabled', array(
+		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_enabled', [
 			'sanitize_callback' => 'absint',
-		) );
+		] );
 
-		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_scope', array(
+		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_scope', [
 			'sanitize_callback' => 'sanitize_text_field',
-		) );
+		] );
 
-		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_start_datetime', array(
+		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_start_datetime', [
 			'sanitize_callback' => 'sanitize_text_field',
-		) );
+		] );
 
-		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_end_datetime', array(
+		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_end_datetime', [
 			'sanitize_callback' => 'sanitize_text_field',
-		) );
+		] );
 
-		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_get_form_support', array(
+		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_get_form_support', [
 			'sanitize_callback' => 'absint',
-		) );
+		] );
 
-		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_url_cleanup', array(
+		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_url_cleanup', [
 			'sanitize_callback' => 'absint',
-		) );
+		] );
 	}
 
 	/**
@@ -132,10 +133,10 @@ class Cache_Yamero {
 		if ( isset( $_POST['submit'] ) ) {
 			check_admin_referer( 'of_cache_yamero_settings' );
 
-			update_option( 'of_cache_yamero_enabled', isset( $_POST['of_cache_yamero_enabled'] ) ? 1 : 0 );
-			update_option( 'of_cache_yamero_scope', isset( $_POST['of_cache_yamero_scope'] ) ? sanitize_text_field( wp_unslash( $_POST['of_cache_yamero_scope'] ) ) : '' );
-			update_option( 'of_cache_yamero_start_datetime', isset( $_POST['of_cache_yamero_start_datetime'] ) ? sanitize_text_field( wp_unslash( $_POST['of_cache_yamero_start_datetime'] ) ) : '' );
-			update_option( 'of_cache_yamero_end_datetime', isset( $_POST['of_cache_yamero_end_datetime'] ) ? sanitize_text_field( wp_unslash( $_POST['of_cache_yamero_end_datetime'] ) ) : '' );
+				update_option( 'of_cache_yamero_enabled', isset( $_POST['of_cache_yamero_enabled'] ) ? 1 : 0 );
+			update_option( 'of_cache_yamero_scope', $this->validate_scope( isset( $_POST['of_cache_yamero_scope'] ) ? wp_unslash( $_POST['of_cache_yamero_scope'] ) : '' ) );
+			update_option( 'of_cache_yamero_start_datetime', $this->validate_datetime( isset( $_POST['of_cache_yamero_start_datetime'] ) ? wp_unslash( $_POST['of_cache_yamero_start_datetime'] ) : '' ) );
+			update_option( 'of_cache_yamero_end_datetime', $this->validate_datetime( isset( $_POST['of_cache_yamero_end_datetime'] ) ? wp_unslash( $_POST['of_cache_yamero_end_datetime'] ) : '' ) );
 			update_option( 'of_cache_yamero_get_form_support', isset( $_POST['of_cache_yamero_get_form_support'] ) ? 1 : 0 );
 			update_option( 'of_cache_yamero_url_cleanup', isset( $_POST['of_cache_yamero_url_cleanup'] ) ? 1 : 0 );
 			update_option( 'of_cache_yamero_apply_css', isset( $_POST['of_cache_yamero_apply_css'] ) ? 1 : 0 );
@@ -266,7 +267,7 @@ class Cache_Yamero {
 		wp_enqueue_script(
 			'cache-yamero',
 			CACHE_YAMERO_PLUGIN_URL . 'assets/js/cache-yamero.js',
-			array(),
+			[],
 			CACHE_YAMERO_VERSION,
 			true
 		);
@@ -275,11 +276,11 @@ class Cache_Yamero {
 		wp_localize_script(
 			'cache-yamero',
 			'cacheYamero',
-			array(
+			[
 				'enabled'         => $this->of_is_enabled(),
 				'getFormSupport'  => (bool) get_option( 'of_cache_yamero_get_form_support', true ),
 				'urlCleanup'      => (bool) get_option( 'of_cache_yamero_url_cleanup', true ),
-			)
+			]
 		);
 	}
 
@@ -349,15 +350,15 @@ class Cache_Yamero {
 	private function of_init_resource_hooks() {
 		$priority = apply_filters( 'cache_yamero_loader_priority', 10 );
 
-		add_filter( 'style_loader_src', array( $this, 'of_add_cache_param_to_style' ), $priority );
-		add_filter( 'script_loader_src', array( $this, 'of_add_cache_param_to_script' ), $priority );
-		add_filter( 'wp_get_attachment_url', array( $this, 'of_add_cache_param_to_attachment_url' ), $priority );
-		add_filter( 'wp_get_attachment_image_src', array( $this, 'of_add_cache_param_to_attachment_image_src' ), $priority );
-		add_filter( 'wp_get_attachment_image_url', array( $this, 'of_add_cache_param_to_attachment_url' ), $priority );
-		add_filter( 'wp_get_attachment_image_attributes', array( $this, 'of_add_cache_param_to_attachment_image_attributes' ), $priority, 3 );
-		add_filter( 'wp_calculate_image_srcset', array( $this, 'of_add_cache_param_to_image_srcset' ), $priority );
-		add_filter( 'the_content', array( $this, 'of_filter_content_images' ), $priority );
-		add_filter( 'post_thumbnail_html', array( $this, 'of_filter_thumbnail_images' ), $priority );
+		add_filter( 'style_loader_src', [ $this, 'of_add_cache_param_to_style' ], $priority );
+		add_filter( 'script_loader_src', [ $this, 'of_add_cache_param_to_script' ], $priority );
+		add_filter( 'wp_get_attachment_url', [ $this, 'of_add_cache_param_to_attachment_url' ], $priority );
+		add_filter( 'wp_get_attachment_image_src', [ $this, 'of_add_cache_param_to_attachment_image_src' ], $priority );
+		add_filter( 'wp_get_attachment_image_url', [ $this, 'of_add_cache_param_to_attachment_url' ], $priority );
+		add_filter( 'wp_get_attachment_image_attributes', [ $this, 'of_add_cache_param_to_attachment_image_attributes' ], $priority, 3 );
+		add_filter( 'wp_calculate_image_srcset', [ $this, 'of_add_cache_param_to_image_srcset' ], $priority );
+		add_filter( 'the_content', [ $this, 'of_filter_content_images' ], $priority );
+		add_filter( 'post_thumbnail_html', [ $this, 'of_filter_thumbnail_images' ], $priority );
 	}
 
 	/**
@@ -397,11 +398,11 @@ class Cache_Yamero {
 		}
 
 		if ( $resource_type ) {
-			$defaults = array(
+			$defaults = [
 				'css' => true,
 				'js' => true,
 				'images' => true,
-			);
+			];
 			$default_value = isset( $defaults[ $resource_type ] ) ? $defaults[ $resource_type ] : true;
 			if ( ! get_option( "of_cache_yamero_apply_{$resource_type}", $default_value ) ) {
 				return $url;
@@ -418,7 +419,7 @@ class Cache_Yamero {
 			return $url;
 		}
 
-		$query_args = array();
+		$query_args = [];
 		if ( ! empty( $parsed['query'] ) ) {
 			wp_parse_str( $parsed['query'], $query_args );
 		}
@@ -457,7 +458,7 @@ class Cache_Yamero {
 		}
 
 		$sources = explode( ',', $srcset );
-		$updated_sources = array();
+		$updated_sources = [];
 
 		foreach ( $sources as $source ) {
 			$source = trim( $source );
@@ -484,7 +485,7 @@ class Cache_Yamero {
 			return $html;
 		}
 
-		$lazy_attrs = array( 'data-src', 'data-srcset', 'data-original', 'data-lazy', 'data-lazy-src' );
+		$lazy_attrs = [ 'data-src', 'data-srcset', 'data-original', 'data-lazy', 'data-lazy-src' ];
 
 		foreach ( $lazy_attrs as $attr ) {
 			$html = preg_replace_callback(
@@ -594,6 +595,45 @@ class Cache_Yamero {
 		}
 
 		return $sources;
+	}
+
+	/**
+	 * スコープ値の検証
+	 *
+	 * @param string $scope スコープ値
+	 * @return string 検証済みスコープ値
+	 */
+	private function validate_scope( $scope ) {
+		$allowed_scopes = [ 'admin_only', 'all_visitors' ];
+		return in_array( $scope, $allowed_scopes, true ) ? $scope : 'admin_only';
+	}
+
+	/**
+	 * 日時入力の検証
+	 *
+	 * @param string $datetime 日時文字列
+	 * @return string 検証済み日時文字列
+	 */
+	private function validate_datetime( $datetime ) {
+		if ( empty( $datetime ) ) {
+			return '';
+		}
+
+		$sanitized = sanitize_text_field( $datetime );
+		$parsed = DateTime::createFromFormat( 'Y-m-d\TH:i', $sanitized );
+
+		if ( false === $parsed ) {
+			return '';
+		}
+
+		return $parsed->format( 'Y-m-d\TH:i' );
+	}
+
+	/**
+	 * 翻訳ファイル読み込み
+	 */
+	public function load_textdomain() {
+		load_plugin_textdomain( 'cache-yamero', false, basename( CACHE_YAMERO_PLUGIN_DIR ) . '/languages' );
 	}
 
 }

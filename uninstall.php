@@ -13,7 +13,7 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 }
 
 // プラグイン専用オプションを削除
-$options_to_delete = array(
+$options_to_delete = [
 	'of_cache_yamero_enabled',
 	'of_cache_yamero_scope',
 	'of_cache_yamero_start_datetime',
@@ -23,7 +23,7 @@ $options_to_delete = array(
 	'of_cache_yamero_apply_css',
 	'of_cache_yamero_apply_js',
 	'of_cache_yamero_apply_images',
-);
+];
 
 foreach ( $options_to_delete as $option_name ) {
 	delete_option( $option_name );
