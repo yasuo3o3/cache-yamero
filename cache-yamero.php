@@ -452,9 +452,9 @@ class Cache_Yamero {
 				function( $matches ) use ( $attr ) {
 					$url = $matches[2];
 					if ( 'data-srcset' === $attr ) {
-						$new_url = $this->of_add_cache_param_to_srcset( $url );
+						$new_url = $this->of_add_cache_param_to_srcset( $url, 'images' );
 					} else {
-						$new_url = $this->of_add_cache_param_to_url( $url );
+						$new_url = $this->of_add_cache_param_to_url( $url, 'images' );
 					}
 					return $matches[1] . $new_url . $matches[3];
 				},
@@ -465,7 +465,7 @@ class Cache_Yamero {
 		$html = preg_replace_callback(
 			'/(<(?:img|source)[^>]*\ssrc=")([^"]+)(")/i',
 			function( $matches ) {
-				return $matches[1] . $this->of_add_cache_param_to_url( $matches[2] ) . $matches[3];
+				return $matches[1] . $this->of_add_cache_param_to_url( $matches[2], 'images' ) . $matches[3];
 			},
 			$html
 		);
@@ -473,7 +473,7 @@ class Cache_Yamero {
 		$html = preg_replace_callback(
 			'/(<(?:img|source)[^>]*\ssrcset=")([^"]+)(")/i',
 			function( $matches ) {
-				return $matches[1] . $this->of_add_cache_param_to_srcset( $matches[2] ) . $matches[3];
+				return $matches[1] . $this->of_add_cache_param_to_srcset( $matches[2], 'images' ) . $matches[3];
 			},
 			$html
 		);
