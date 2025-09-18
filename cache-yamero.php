@@ -67,6 +67,10 @@ class Cache_Yamero {
 			'end_datetime'      => '',
 			'get_form_support'  => true,
 			'url_cleanup'       => true,
+			'apply_css'         => true,
+			'apply_js'          => true,
+			'apply_images'      => true,
+			'apply_fonts'       => false,
 		);
 
 		foreach ( $defaults as $key => $value ) {
@@ -392,20 +396,28 @@ class Cache_Yamero {
 	/**
 	 * URLにキャッシュパラメータを追加
 	 */
-	private function of_add_cache_param_to_url( $url, $resource_type = '' ) {
+	private function of_add_cache_param_to_url( $url, $resource_type = null ) {
 		if ( empty( $url ) || ! $this->of_is_active_for_current_user() ) {
 			return $url;
 		}
 
 		$is_font = preg_match( '/\.(woff2|woff|ttf|otf|eot)(\?.*)?$/i', $url );
-		if ( $is_font && ! get_option( 'of_cache_yamero_apply_fonts', false ) ) {
-			return $url;
-		}
-		if ( ! $is_font && $resource_type ) {
-			$apply_option = 'of_cache_yamero_apply_' . $resource_type;
-			if ( ! get_option( $apply_option, true ) ) {
+
+		if ( $resource_type ) {
+			$defaults = array(
+				'css' => true,
+				'js' => true,
+				'images' => true,
+				'fonts' => false,
+			);
+			$default_value = isset( $defaults[ $resource_type ] ) ? $defaults[ $resource_type ] : true;
+			if ( ! get_option( "of_cache_yamero_apply_{$resource_type}", $default_value ) ) {
 				return $url;
 			}
+		}
+
+		if ( $is_font && ! get_option( 'of_cache_yamero_apply_fonts', false ) ) {
+			return $url;
 		}
 
 		if ( preg_match( '/^(data:|blob:|about:)/', $url ) ) {
@@ -450,7 +462,7 @@ class Cache_Yamero {
 	/**
 	 * srcset文字列にキャッシュパラメータを追加
 	 */
-	private function of_add_cache_param_to_srcset( $srcset ) {
+	private function of_add_cache_param_to_srcset( $srcset, $resource_type = null ) {
 		if ( empty( $srcset ) || ! $this->of_is_active_for_current_user() ) {
 			return $srcset;
 		}
@@ -466,7 +478,7 @@ class Cache_Yamero {
 
 			$parts = preg_split( '/\s+/', $source, 2 );
 			if ( ! empty( $parts[0] ) ) {
-				$url = $this->of_add_cache_param_to_url( $parts[0] );
+				$url = $this->of_add_cache_param_to_url( $parts[0], $resource_type );
 				$descriptor = isset( $parts[1] ) ? ' ' . $parts[1] : '';
 				$updated_sources[] = $url . $descriptor;
 			}
@@ -524,14 +536,14 @@ class Cache_Yamero {
 	 * スタイルローダーのURLをフィルタ
 	 */
 	public function of_add_cache_param_to_style( $src ) {
-		return $this->of_add_cache_param_to_url( $src );
+		return $this->of_add_cache_param_to_url( $src, 'css' );
 	}
 
 	/**
 	 * スクリプトローダーのURLをフィルタ
 	 */
 	public function of_add_cache_param_to_script( $src ) {
-		return $this->of_add_cache_param_to_url( $src );
+		return $this->of_add_cache_param_to_url( $src, 'js' );
 	}
 
 	/**
@@ -556,10 +568,10 @@ class Cache_Yamero {
 	 */
 	public function of_add_cache_param_to_attachment_image_attributes( $attr, $attachment, $size ) {
 		if ( isset( $attr['src'] ) ) {
-			$attr['src'] = $this->of_add_cache_param_to_url( $attr['src'] );
+			$attr['src'] = $this->of_add_cache_param_to_url( $attr['src'], 'images' );
 		}
 		if ( isset( $attr['srcset'] ) ) {
-			$attr['srcset'] = $this->of_add_cache_param_to_srcset( $attr['srcset'] );
+			$attr['srcset'] = $this->of_add_cache_param_to_srcset( $attr['srcset'], 'images' );
 		}
 		return $attr;
 	}
