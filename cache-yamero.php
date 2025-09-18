@@ -17,6 +17,7 @@
  * Author:            yasuo3o3
  * Author URI:        https://yasuo-o.xyz/
  * Text Domain:       cache-yamero
+ * Domain Path:       /languages
  * License:           GPL v2 or later
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  */
@@ -45,7 +46,6 @@ class Cache_Yamero {
 		add_action( 'admin_menu', [ $this, 'of_add_admin_menu' ] );
 		add_action( 'admin_init', [ $this, 'of_admin_init' ] );
 		add_action( 'wp_enqueue_scripts', [ $this, 'of_enqueue_scripts' ] );
-		add_action( 'plugins_loaded', [ $this, 'load_textdomain' ] );
 		$this->of_init_resource_hooks();
 	}
 
@@ -133,10 +133,19 @@ class Cache_Yamero {
 		if ( isset( $_POST['submit'] ) ) {
 			check_admin_referer( 'of_cache_yamero_settings' );
 
-				update_option( 'of_cache_yamero_enabled', isset( $_POST['of_cache_yamero_enabled'] ) ? 1 : 0 );
-			update_option( 'of_cache_yamero_scope', $this->validate_scope( isset( $_POST['of_cache_yamero_scope'] ) ? wp_unslash( $_POST['of_cache_yamero_scope'] ) : '' ) );
-			update_option( 'of_cache_yamero_start_datetime', $this->validate_datetime( isset( $_POST['of_cache_yamero_start_datetime'] ) ? wp_unslash( $_POST['of_cache_yamero_start_datetime'] ) : '' ) );
-			update_option( 'of_cache_yamero_end_datetime', $this->validate_datetime( isset( $_POST['of_cache_yamero_end_datetime'] ) ? wp_unslash( $_POST['of_cache_yamero_end_datetime'] ) : '' ) );
+			update_option( 'of_cache_yamero_enabled', isset( $_POST['of_cache_yamero_enabled'] ) ? 1 : 0 );
+
+			$scope_raw = isset( $_POST['of_cache_yamero_scope'] ) ? wp_unslash( $_POST['of_cache_yamero_scope'] ) : '';
+			$scope = sanitize_key( $scope_raw );
+			update_option( 'of_cache_yamero_scope', $this->validate_scope( $scope ) );
+
+			$start_datetime_raw = isset( $_POST['of_cache_yamero_start_datetime'] ) ? wp_unslash( $_POST['of_cache_yamero_start_datetime'] ) : '';
+			$start_datetime = sanitize_text_field( $start_datetime_raw );
+			update_option( 'of_cache_yamero_start_datetime', $this->validate_datetime( $start_datetime ) );
+
+			$end_datetime_raw = isset( $_POST['of_cache_yamero_end_datetime'] ) ? wp_unslash( $_POST['of_cache_yamero_end_datetime'] ) : '';
+			$end_datetime = sanitize_text_field( $end_datetime_raw );
+			update_option( 'of_cache_yamero_end_datetime', $this->validate_datetime( $end_datetime ) );
 			update_option( 'of_cache_yamero_get_form_support', isset( $_POST['of_cache_yamero_get_form_support'] ) ? 1 : 0 );
 			update_option( 'of_cache_yamero_url_cleanup', isset( $_POST['of_cache_yamero_url_cleanup'] ) ? 1 : 0 );
 			update_option( 'of_cache_yamero_apply_css', isset( $_POST['of_cache_yamero_apply_css'] ) ? 1 : 0 );
@@ -619,21 +628,13 @@ class Cache_Yamero {
 			return '';
 		}
 
-		$sanitized = sanitize_text_field( $datetime );
-		$parsed = DateTime::createFromFormat( 'Y-m-d\TH:i', $sanitized );
+		$parsed = DateTime::createFromFormat( 'Y-m-d\TH:i', $datetime );
 
 		if ( false === $parsed ) {
 			return '';
 		}
 
 		return $parsed->format( 'Y-m-d\TH:i' );
-	}
-
-	/**
-	 * 翻訳ファイル読み込み
-	 */
-	public function load_textdomain() {
-		load_plugin_textdomain( 'cache-yamero', false, basename( CACHE_YAMERO_PLUGIN_DIR ) . '/languages' );
 	}
 
 }
