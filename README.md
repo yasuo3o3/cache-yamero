@@ -1,12 +1,13 @@
 # Cache Yamero
 
-Stop cache from messing with your CSS/HTML reloads during development.
-Add a unique timestamp query (`?cache-yamero=YYYYMMDDHHmmss`) to links on click, forcing browsers to always fetch the fresh page.
+Stop cache from interfering with CSS/JS/image reloads during development.
+Add a unique timestamp query (`?cache-yamero=YYYYMMDDHHmmss`) to links and resources on click, forcing browsers to always fetch fresh content.
 
-開発時のキャッシュ問題を解決するWordPressプラグイン。人の操作時のみページ遷移URLにタイムスタンプクエリを付与し、常に新しいHTML/CSSを取得します。
+開発時のキャッシュ問題を解決するWordPressプラグイン。人の操作時のみページ遷移URLやリソース（CSS/JS/画像）にタイムスタンプクエリを付与し、常に新しいコンテンツを取得します。
 
 ## Features / 主な機能
 
+- **Resource-specific targeting** / **リソース種別ターゲティング** - Individual control over CSS, JavaScript, and images
 - **Click-only query appending** / **クリック時のみクエリ付与** - Only affects human navigation, not crawlers
 - **DOM non-destructive** / **DOM非改変** - Clean URLs for SEO, dynamic URLs for navigation
 - **Admin-only or All visitors** / **管理者限定 or 全訪問者** - Flexible scope control
@@ -37,6 +38,12 @@ Add a unique timestamp query (`?cache-yamero=YYYYMMDDHHmmss`) to links on click,
 1. Enable the plugin / プラグインを有効化
 2. Choose scope: "Admins only" or "All visitors" / 適用範囲を選択：「管理者のみ」または「すべての訪問者」
 3. Optionally set time window / 必要に応じて有効期間を設定
+
+### Resource Control / リソース制御
+
+- **CSS** - Cache-bust CSS stylesheets / CSSスタイルシートのキャッシュ無効化
+- **JavaScript** - Cache-bust JavaScript files / JavaScriptファイルのキャッシュ無効化
+- **Images** - Cache-bust images (including srcset and lazy loading) / 画像のキャッシュ無効化（srcset・遅延読み込み対応）
 
 ### Options / オプション
 

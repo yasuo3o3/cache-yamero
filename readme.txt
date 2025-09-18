@@ -4,11 +4,11 @@ Tags: cache, development, debug, refresh
 Requires at least: 6.0
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Stop cache from interfering with CSS/HTML reloads by appending a timestamp query to links during development.
+Stop cache from interfering with CSS/JS/image reloads by appending a timestamp query to links during development.
 
 
 == Description ==
@@ -18,16 +18,18 @@ Stop cache from interfering with CSS/HTML reloads by appending a timestamp query
 Instead of rewriting your theme or touching .htaccess, this plugin dynamically appends a query parameter  
 `?cache-yamero=YYYYMMDDHHmmss` **only at the moment of navigation (click, form submit, location redirect)**.  
 
-- DOM is not modified → SEO and crawlers see clean URLs.  
-- Humans clicking links will always fetch the newest HTML/CSS.  
-- Useful during **pre-launch checks**, **staging reviews**, or when browsers hold on to cached CSS.  
+- DOM is not modified → SEO and crawlers see clean URLs.
+- Humans clicking links will always fetch the newest HTML/CSS/JS/images.
+- Resource-specific targeting: CSS, JavaScript, and images can be individually controlled.
+- Useful during **pre-launch checks**, **staging reviews**, or when browsers hold on to cached resources.  
 
 **Key features:**
-* Apply to **Admins only** (default) or to **All visitors** (optional).  
-* Timestamp is always updated (to the second).  
-* Supports normal link clicks and GET form submissions.  
-* Excludes anchors, external domains, `mailto:`, `tel:`, `download`, `_blank`, modifier-key clicks.  
-* Includes **Back/Forward Cache (BFCache) handling**: when coming back via browser history, a single reload ensures fresh CSS.  
+* **Resource targeting**: Choose which resources to apply cache-busting - CSS, JavaScript, and/or images.
+* Apply to **Admins only** (default) or to **All visitors** (optional).
+* Timestamp is always updated (to the second).
+* Supports normal link clicks and GET form submissions.
+* Excludes anchors, external domains, `mailto:`, `tel:`, `download`, `_blank`, modifier-key clicks.
+* Includes **Back/Forward Cache (BFCache) handling**: when coming back via browser history, a single reload ensures fresh resources.
 * Optional automatic cleanup of the query from the address bar (so shared URLs stay clean).  
 
 == Installation ==
@@ -69,16 +71,25 @@ can review the site with fresh reloads, without having to log in. This is useful
 
 == Changelog ==
 
-= 1.0.0 =  
-* Initial release.  
-* Link click + GET form cache busting with `cache-yamero` query.  
-* Admin-only mode and All-visitors mode.  
-* BFCache reload handling.  
+= 1.1.0 =
+* **Added**: Resource-specific targeting for CSS, JavaScript, and images.
+* **Added**: Individual control over which resource types receive cache-busting parameters.
+* **Improved**: Enhanced image handling with support for srcset and lazy loading attributes.
+* **Streamlined**: Simplified codebase by removing experimental font support.
+
+= 1.0.0 =
+* Initial release.
+* Link click + GET form cache busting with `cache-yamero` query.
+* Admin-only mode and All-visitors mode.
+* BFCache reload handling.
 * Optional URL cleanup.  
 
 == Upgrade Notice ==
 
-= 1.0.0 =  
+= 1.1.0 =
+New resource-specific targeting! Now you can choose which resource types (CSS, JS, images) to apply cache-busting to.
+
+= 1.0.0 =
 First release. Enable only when you need to force fresh reloads during development or pre-launch checks.
 
 
@@ -87,15 +98,16 @@ First release. Enable only when you need to force fresh reloads during developme
 
 == 説明 ==
 
-**Cache Yamero** は、開発時のキャッシュ問題を解決する WordPress プラグインです。  
-人の操作（クリックやフォーム送信）時のみ、ページ遷移URLに `?cache-yamero=YYYYMMDDHHmmss` パラメータを自動付与し、常に新しいHTML/CSSを取得します。
+**Cache Yamero** は、開発時のキャッシュ問題を解決する WordPress プラグインです。
+人の操作（クリックやフォーム送信）時のみ、ページ遷移URLに `?cache-yamero=YYYYMMDDHHmmss` パラメータを自動付与し、常に新しいHTML/CSS/JS/画像を取得します。
 
 **主な特徴:**
-* **クリック時だけクエリ付与** - 自動的な遷移や検索エンジンのクローリングには影響しません  
-* **DOM非改変** - ページのHTMLを直接書き換えることなく、遷移時のみURLを動的に変更  
-* **SEO影響最小化** - 検索エンジンには通常のURLが見えるため、SEOへの悪影響を防ぎます  
-* **BFCache対応** - ブラウザの戻るボタン使用時も適切にキャッシュを無効化  
-* **期間限定対応** - 開始・終了日時を設定して一時的な運用が可能  
+* **リソース種別ターゲティング** - CSS、JavaScript、画像を個別に制御可能
+* **クリック時だけクエリ付与** - 自動的な遷移や検索エンジンのクローリングには影響しません
+* **DOM非改変** - ページのHTMLを直接書き換えることなく、遷移時のみURLを動的に変更
+* **SEO影響最小化** - 検索エンジンには通常のURLが見えるため、SEOへの悪影響を防ぎます
+* **BFCache対応** - ブラウザの戻るボタン使用時も適切にキャッシュを無効化
+* **期間限定対応** - 開始・終了日時を設定して一時的な運用が可能
 * **権限ベース制御** - 管理者のみまたはすべての訪問者への適用を選択可能  
 
 == インストール ==
