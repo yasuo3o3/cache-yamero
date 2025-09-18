@@ -70,7 +70,6 @@ class Cache_Yamero {
 			'apply_css'         => true,
 			'apply_js'          => true,
 			'apply_images'      => true,
-			'apply_fonts'       => false,
 		);
 
 		foreach ( $defaults as $key => $value ) {
@@ -142,7 +141,6 @@ class Cache_Yamero {
 			update_option( 'of_cache_yamero_apply_css', isset( $_POST['of_cache_yamero_apply_css'] ) ? 1 : 0 );
 			update_option( 'of_cache_yamero_apply_js', isset( $_POST['of_cache_yamero_apply_js'] ) ? 1 : 0 );
 			update_option( 'of_cache_yamero_apply_images', isset( $_POST['of_cache_yamero_apply_images'] ) ? 1 : 0 );
-			update_option( 'of_cache_yamero_apply_fonts', isset( $_POST['of_cache_yamero_apply_fonts'] ) ? 1 : 0 );
 
 			echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( '設定を保存しました。', 'cache-yamero' ) . '</p></div>';
 		}
@@ -156,7 +154,6 @@ class Cache_Yamero {
 		$apply_css         = get_option( 'of_cache_yamero_apply_css', true );
 		$apply_js          = get_option( 'of_cache_yamero_apply_js', true );
 		$apply_images      = get_option( 'of_cache_yamero_apply_images', true );
-		$apply_fonts       = get_option( 'of_cache_yamero_apply_fonts', false );
 		?>
 		<div class="wrap">
 			<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
@@ -245,10 +242,6 @@ class Cache_Yamero {
 								<label style="margin-left: 15px;">
 									<input type="checkbox" name="of_cache_yamero_apply_images" value="1" <?php checked( $apply_images ); ?> />
 									<?php esc_html_e( '画像', 'cache-yamero' ); ?>
-								</label>
-								<label style="margin-left: 15px;">
-									<input type="checkbox" name="of_cache_yamero_apply_fonts" value="1" <?php checked( $apply_fonts ); ?> />
-									<?php esc_html_e( 'フォント', 'cache-yamero' ); ?>
 								</label>
 							</p>
 							<p class="description"><?php esc_html_e( 'チェックした種類のリソースにキャッシュ無効化パラメータを付与します。', 'cache-yamero' ); ?></p>
@@ -360,7 +353,9 @@ class Cache_Yamero {
 		add_filter( 'script_loader_src', array( $this, 'of_add_cache_param_to_script' ), $priority );
 		add_filter( 'wp_get_attachment_url', array( $this, 'of_add_cache_param_to_attachment_url' ), $priority );
 		add_filter( 'wp_get_attachment_image_src', array( $this, 'of_add_cache_param_to_attachment_image_src' ), $priority );
+		add_filter( 'wp_get_attachment_image_url', array( $this, 'of_add_cache_param_to_attachment_url' ), $priority );
 		add_filter( 'wp_get_attachment_image_attributes', array( $this, 'of_add_cache_param_to_attachment_image_attributes' ), $priority, 3 );
+		add_filter( 'wp_calculate_image_srcset', array( $this, 'of_add_cache_param_to_image_srcset' ), $priority );
 		add_filter( 'the_content', array( $this, 'of_filter_content_images' ), $priority );
 		add_filter( 'post_thumbnail_html', array( $this, 'of_filter_thumbnail_images' ), $priority );
 	}
@@ -401,14 +396,11 @@ class Cache_Yamero {
 			return $url;
 		}
 
-		$is_font = preg_match( '/\.(woff2|woff|ttf|otf|eot)(\?.*)?$/i', $url );
-
 		if ( $resource_type ) {
 			$defaults = array(
 				'css' => true,
 				'js' => true,
 				'images' => true,
-				'fonts' => false,
 			);
 			$default_value = isset( $defaults[ $resource_type ] ) ? $defaults[ $resource_type ] : true;
 			if ( ! get_option( "of_cache_yamero_apply_{$resource_type}", $default_value ) ) {
@@ -416,9 +408,6 @@ class Cache_Yamero {
 			}
 		}
 
-		if ( $is_font && ! get_option( 'of_cache_yamero_apply_fonts', false ) ) {
-			return $url;
-		}
 
 		if ( preg_match( '/^(data:|blob:|about:)/', $url ) ) {
 			return $url;
@@ -550,7 +539,7 @@ class Cache_Yamero {
 	 * 添付ファイルURLをフィルタ
 	 */
 	public function of_add_cache_param_to_attachment_url( $url ) {
-		return $this->of_add_cache_param_to_url( $url );
+		return $this->of_add_cache_param_to_url( $url, 'images' );
 	}
 
 	/**
@@ -558,7 +547,7 @@ class Cache_Yamero {
 	 */
 	public function of_add_cache_param_to_attachment_image_src( $image ) {
 		if ( is_array( $image ) && isset( $image[0] ) ) {
-			$image[0] = $this->of_add_cache_param_to_url( $image[0] );
+			$image[0] = $this->of_add_cache_param_to_url( $image[0], 'images' );
 		}
 		return $image;
 	}
@@ -589,6 +578,24 @@ class Cache_Yamero {
 	public function of_filter_thumbnail_images( $html ) {
 		return $this->of_filter_lazy_attributes( $html );
 	}
+
+	/**
+	 * wp_calculate_image_srcsetの配列にキャッシュパラメータを追加
+	 */
+	public function of_add_cache_param_to_image_srcset( $sources ) {
+		if ( ! is_array( $sources ) || ! $this->of_is_active_for_current_user() ) {
+			return $sources;
+		}
+
+		foreach ( $sources as $width => $source ) {
+			if ( isset( $source['url'] ) ) {
+				$sources[ $width ]['url'] = $this->of_add_cache_param_to_url( $source['url'], 'images' );
+			}
+		}
+
+		return $sources;
+	}
+
 }
 
 // プラグイン初期化

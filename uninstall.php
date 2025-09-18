@@ -20,6 +20,9 @@ $options_to_delete = array(
 	'of_cache_yamero_end_datetime',
 	'of_cache_yamero_get_form_support',
 	'of_cache_yamero_url_cleanup',
+	'of_cache_yamero_apply_css',
+	'of_cache_yamero_apply_js',
+	'of_cache_yamero_apply_images',
 );
 
 foreach ( $options_to_delete as $option_name ) {
