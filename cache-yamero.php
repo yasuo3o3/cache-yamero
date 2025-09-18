@@ -135,6 +135,10 @@ class Cache_Yamero {
 			update_option( 'of_cache_yamero_end_datetime', isset( $_POST['of_cache_yamero_end_datetime'] ) ? sanitize_text_field( wp_unslash( $_POST['of_cache_yamero_end_datetime'] ) ) : '' );
 			update_option( 'of_cache_yamero_get_form_support', isset( $_POST['of_cache_yamero_get_form_support'] ) ? 1 : 0 );
 			update_option( 'of_cache_yamero_url_cleanup', isset( $_POST['of_cache_yamero_url_cleanup'] ) ? 1 : 0 );
+			update_option( 'of_cache_yamero_apply_css', isset( $_POST['of_cache_yamero_apply_css'] ) ? 1 : 0 );
+			update_option( 'of_cache_yamero_apply_js', isset( $_POST['of_cache_yamero_apply_js'] ) ? 1 : 0 );
+			update_option( 'of_cache_yamero_apply_images', isset( $_POST['of_cache_yamero_apply_images'] ) ? 1 : 0 );
+			update_option( 'of_cache_yamero_apply_fonts', isset( $_POST['of_cache_yamero_apply_fonts'] ) ? 1 : 0 );
 
 			echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( '設定を保存しました。', 'cache-yamero' ) . '</p></div>';
 		}
