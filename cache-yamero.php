@@ -199,14 +199,22 @@ class Cache_Yamero {
 									<input type="checkbox" name="of_cache_yamero_get_form_support" value="1" <?php checked( $get_form_support ); ?> />
 									<?php esc_html_e( 'GETフォーム対応', 'cache-yamero' ); ?>
 								</label>
-								<span class="description"><?php esc_html_e( 'GETフォーム送信時にもキャッシュ無効化パラメータを付与します。', 'cache-yamero' ); ?></span>
+								<span class="description">
+									<?php esc_html_e( 'GETフォーム送信時にもキャッシュ無効化パラメータを付与します。', 'cache-yamero' ); ?>
+									<br>
+									<?php esc_html_e( '（フォーム送信後にキャッシュ済みページを返されるのを避け、必ず最新の結果を取得）', 'cache-yamero' ); ?>
+								</span>
 							</p>
 							<p>
 								<label>
 									<input type="checkbox" name="of_cache_yamero_url_cleanup" value="1" <?php checked( $url_cleanup ); ?> />
 									<?php esc_html_e( 'URLクリーンアップ', 'cache-yamero' ); ?>
 								</label>
-								<span class="description"><?php esc_html_e( '表示後にアドレスバーからcache-yameroパラメータを除去します。', 'cache-yamero' ); ?></span>
+								<span class="description">
+									<?php esc_html_e( '表示後にアドレスバーからcache-yameroパラメータを除去します。', 'cache-yamero' ); ?>
+									<br>
+									<?php esc_html_e( '（ユーザーには美しいURLを表示、開発者には確実なキャッシュ無効化を提供する）', 'cache-yamero' ); ?>
+								</span>
 							</p>
 						</td>
 					</tr>
