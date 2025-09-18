@@ -3,9 +3,9 @@
 # This file is distributed under the GPL v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Cache Yamero 1.0.0\n"
+"Project-Id-Version: Cache Yamero 1.1.0\n"
 "Report-Msgid-Bugs-To: https://yasuo-o.xyz/\n"
-"POT-Creation-Date: 2024-09-16 12:00+0900\n"
+"POT-Creation-Date: 2024-09-18 12:00+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"

@@ -11,7 +11,7 @@
  * Plugin Name:       Cache Yamero
  * Plugin URI:        https://yasuo-o.xyz/
  * Description:       人の操作時だけページ遷移URLに ?cache-yamero=YYYYMMDDHHmmss を付与してキャッシュを無効化する開発補助ツール。DOMは汚さない。公開前後の一時運用にも対応。
- * Version:           1.0.0
+ * Version:           1.1.0
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            yasuo3o3
@@ -27,7 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // プラグインの基本定数
-define( 'CACHE_YAMERO_VERSION', '1.0.0' );
+define( 'CACHE_YAMERO_VERSION', '1.1.0' );
 define( 'CACHE_YAMERO_PLUGIN_FILE', __FILE__ );
 define( 'CACHE_YAMERO_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'CACHE_YAMERO_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
