@@ -392,13 +392,20 @@ class Cache_Yamero {
 	/**
 	 * URLにキャッシュパラメータを追加
 	 */
-	private function of_add_cache_param_to_url( $url ) {
+	private function of_add_cache_param_to_url( $url, $resource_type = '' ) {
 		if ( empty( $url ) || ! $this->of_is_active_for_current_user() ) {
 			return $url;
 		}
 
-		if ( preg_match( '/\.(woff2|woff|ttf|otf|eot)(\?.*)?$/i', $url ) ) {
+		$is_font = preg_match( '/\.(woff2|woff|ttf|otf|eot)(\?.*)?$/i', $url );
+		if ( $is_font && ! get_option( 'of_cache_yamero_apply_fonts', false ) ) {
 			return $url;
+		}
+		if ( ! $is_font && $resource_type ) {
+			$apply_option = 'of_cache_yamero_apply_' . $resource_type;
+			if ( ! get_option( $apply_option, true ) ) {
+				return $url;
+			}
 		}
 
 		if ( preg_match( '/^(data:|blob:|about:)/', $url ) ) {
