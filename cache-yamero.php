@@ -145,6 +145,10 @@ class Cache_Yamero {
 		$end_datetime      = get_option( 'of_cache_yamero_end_datetime', '' );
 		$get_form_support  = get_option( 'of_cache_yamero_get_form_support', true );
 		$url_cleanup       = get_option( 'of_cache_yamero_url_cleanup', true );
+		$apply_css         = get_option( 'of_cache_yamero_apply_css', true );
+		$apply_js          = get_option( 'of_cache_yamero_apply_js', true );
+		$apply_images      = get_option( 'of_cache_yamero_apply_images', true );
+		$apply_fonts       = get_option( 'of_cache_yamero_apply_fonts', false );
 		?>
 		<div class="wrap">
 			<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
@@ -216,6 +220,30 @@ class Cache_Yamero {
 									<?php esc_html_e( '（ユーザーには美しいURLを表示、開発者には確実なキャッシュ無効化を提供する）', 'cache-yamero' ); ?>
 								</span>
 							</p>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row"><?php esc_html_e( '対象リソース', 'cache-yamero' ); ?></th>
+						<td>
+							<p>
+								<label>
+									<input type="checkbox" name="of_cache_yamero_apply_css" value="1" <?php checked( $apply_css ); ?> />
+									<?php esc_html_e( 'CSS', 'cache-yamero' ); ?>
+								</label>
+								<label style="margin-left: 15px;">
+									<input type="checkbox" name="of_cache_yamero_apply_js" value="1" <?php checked( $apply_js ); ?> />
+									<?php esc_html_e( 'JavaScript', 'cache-yamero' ); ?>
+								</label>
+								<label style="margin-left: 15px;">
+									<input type="checkbox" name="of_cache_yamero_apply_images" value="1" <?php checked( $apply_images ); ?> />
+									<?php esc_html_e( '画像', 'cache-yamero' ); ?>
+								</label>
+								<label style="margin-left: 15px;">
+									<input type="checkbox" name="of_cache_yamero_apply_fonts" value="1" <?php checked( $apply_fonts ); ?> />
+									<?php esc_html_e( 'フォント', 'cache-yamero' ); ?>
+								</label>
+							</p>
+							<p class="description"><?php esc_html_e( 'チェックした種類のリソースにキャッシュ無効化パラメータを付与します。', 'cache-yamero' ); ?></p>
 						</td>
 					</tr>
 				</table>
