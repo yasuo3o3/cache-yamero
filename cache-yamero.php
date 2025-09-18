@@ -45,6 +45,7 @@ class Cache_Yamero {
 		add_action( 'admin_menu', array( $this, 'of_add_admin_menu' ) );
 		add_action( 'admin_init', array( $this, 'of_admin_init' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'of_enqueue_scripts' ) );
+		$this->of_init_resource_hooks();
 	}
 
 	/**
@@ -303,6 +304,231 @@ class Cache_Yamero {
 		}
 
 		return true;
+	}
+
+	/**
+	 * リソースフックの初期化
+	 */
+	private function of_init_resource_hooks() {
+		$priority = apply_filters( 'cache_yamero_loader_priority', 10 );
+
+		add_filter( 'style_loader_src', array( $this, 'of_add_cache_param_to_style' ), $priority );
+		add_filter( 'script_loader_src', array( $this, 'of_add_cache_param_to_script' ), $priority );
+		add_filter( 'wp_get_attachment_url', array( $this, 'of_add_cache_param_to_attachment_url' ), $priority );
+		add_filter( 'wp_get_attachment_image_src', array( $this, 'of_add_cache_param_to_attachment_image_src' ), $priority );
+		add_filter( 'wp_get_attachment_image_attributes', array( $this, 'of_add_cache_param_to_attachment_image_attributes' ), $priority, 3 );
+		add_filter( 'the_content', array( $this, 'of_filter_content_images' ), $priority );
+		add_filter( 'post_thumbnail_html', array( $this, 'of_filter_thumbnail_images' ), $priority );
+	}
+
+	/**
+	 * 現在のユーザーに対して有効かチェック
+	 */
+	private function of_is_active_for_current_user() {
+		$enabled = get_option( 'of_cache_yamero_enabled', false );
+		if ( ! $enabled ) {
+			return false;
+		}
+
+		$scope = get_option( 'of_cache_yamero_scope', 'admin_only' );
+		if ( 'admin_only' === $scope && ! current_user_can( 'manage_options' ) ) {
+			return false;
+		}
+
+		return $this->of_is_within_datetime_range();
+	}
+
+	/**
+	 * リクエスト共通のタイムスタンプを取得
+	 */
+	private function of_get_request_timestamp() {
+		static $timestamp = null;
+		if ( null === $timestamp ) {
+			$timestamp = gmdate( 'YmdHis' );
+		}
+		return $timestamp;
+	}
+
+	/**
+	 * URLにキャッシュパラメータを追加
+	 */
+	private function of_add_cache_param_to_url( $url ) {
+		if ( empty( $url ) || ! $this->of_is_active_for_current_user() ) {
+			return $url;
+		}
+
+		if ( preg_match( '/\.(woff2|woff|ttf|otf|eot)(\?.*)?$/i', $url ) ) {
+			return $url;
+		}
+
+		if ( preg_match( '/^(data:|blob:|about:)/', $url ) ) {
+			return $url;
+		}
+
+		$parsed = wp_parse_url( $url );
+		if ( ! $parsed ) {
+			return $url;
+		}
+
+		$query_args = array();
+		if ( ! empty( $parsed['query'] ) ) {
+			wp_parse_str( $parsed['query'], $query_args );
+		}
+
+		$query_args['cache-yamero'] = $this->of_get_request_timestamp();
+
+		$new_url = '';
+		if ( ! empty( $parsed['scheme'] ) ) {
+			$new_url .= $parsed['scheme'] . '://';
+		}
+		if ( ! empty( $parsed['host'] ) ) {
+			$new_url .= $parsed['host'];
+		}
+		if ( ! empty( $parsed['port'] ) ) {
+			$new_url .= ':' . $parsed['port'];
+		}
+		if ( ! empty( $parsed['path'] ) ) {
+			$new_url .= $parsed['path'];
+		}
+
+		$new_url = add_query_arg( $query_args, $new_url );
+
+		if ( ! empty( $parsed['fragment'] ) ) {
+			$new_url .= '#' . $parsed['fragment'];
+		}
+
+		return $new_url;
+	}
+
+	/**
+	 * srcset文字列にキャッシュパラメータを追加
+	 */
+	private function of_add_cache_param_to_srcset( $srcset ) {
+		if ( empty( $srcset ) || ! $this->of_is_active_for_current_user() ) {
+			return $srcset;
+		}
+
+		$sources = explode( ',', $srcset );
+		$updated_sources = array();
+
+		foreach ( $sources as $source ) {
+			$source = trim( $source );
+			if ( empty( $source ) ) {
+				continue;
+			}
+
+			$parts = preg_split( '/\s+/', $source, 2 );
+			if ( ! empty( $parts[0] ) ) {
+				$url = $this->of_add_cache_param_to_url( $parts[0] );
+				$descriptor = isset( $parts[1] ) ? ' ' . $parts[1] : '';
+				$updated_sources[] = $url . $descriptor;
+			}
+		}
+
+		return implode( ', ', $updated_sources );
+	}
+
+	/**
+	 * HTMLコンテンツ内のLazy属性をフィルタ
+	 */
+	private function of_filter_lazy_attributes( $html ) {
+		if ( empty( $html ) || ! $this->of_is_active_for_current_user() ) {
+			return $html;
+		}
+
+		$lazy_attrs = array( 'data-src', 'data-srcset', 'data-original', 'data-lazy', 'data-lazy-src' );
+
+		foreach ( $lazy_attrs as $attr ) {
+			$html = preg_replace_callback(
+				'/(<(?:img|source)[^>]*\s' . preg_quote( $attr, '/' ) . '=")([^"]+)(")/i',
+				function( $matches ) use ( $attr ) {
+					$url = $matches[2];
+					if ( 'data-srcset' === $attr ) {
+						$new_url = $this->of_add_cache_param_to_srcset( $url );
+					} else {
+						$new_url = $this->of_add_cache_param_to_url( $url );
+					}
+					return $matches[1] . $new_url . $matches[3];
+				},
+				$html
+			);
+		}
+
+		$html = preg_replace_callback(
+			'/(<(?:img|source)[^>]*\ssrc=")([^"]+)(")/i',
+			function( $matches ) {
+				return $matches[1] . $this->of_add_cache_param_to_url( $matches[2] ) . $matches[3];
+			},
+			$html
+		);
+
+		$html = preg_replace_callback(
+			'/(<(?:img|source)[^>]*\ssrcset=")([^"]+)(")/i',
+			function( $matches ) {
+				return $matches[1] . $this->of_add_cache_param_to_srcset( $matches[2] ) . $matches[3];
+			},
+			$html
+		);
+
+		return $html;
+	}
+
+	/**
+	 * スタイルローダーのURLをフィルタ
+	 */
+	public function of_add_cache_param_to_style( $src ) {
+		return $this->of_add_cache_param_to_url( $src );
+	}
+
+	/**
+	 * スクリプトローダーのURLをフィルタ
+	 */
+	public function of_add_cache_param_to_script( $src ) {
+		return $this->of_add_cache_param_to_url( $src );
+	}
+
+	/**
+	 * 添付ファイルURLをフィルタ
+	 */
+	public function of_add_cache_param_to_attachment_url( $url ) {
+		return $this->of_add_cache_param_to_url( $url );
+	}
+
+	/**
+	 * 添付ファイル画像srcをフィルタ
+	 */
+	public function of_add_cache_param_to_attachment_image_src( $image ) {
+		if ( is_array( $image ) && isset( $image[0] ) ) {
+			$image[0] = $this->of_add_cache_param_to_url( $image[0] );
+		}
+		return $image;
+	}
+
+	/**
+	 * 添付ファイル画像属性をフィルタ
+	 */
+	public function of_add_cache_param_to_attachment_image_attributes( $attr, $attachment, $size ) {
+		if ( isset( $attr['src'] ) ) {
+			$attr['src'] = $this->of_add_cache_param_to_url( $attr['src'] );
+		}
+		if ( isset( $attr['srcset'] ) ) {
+			$attr['srcset'] = $this->of_add_cache_param_to_srcset( $attr['srcset'] );
+		}
+		return $attr;
+	}
+
+	/**
+	 * コンテンツ内の画像をフィルタ
+	 */
+	public function of_filter_content_images( $content ) {
+		return $this->of_filter_lazy_attributes( $content );
+	}
+
+	/**
+	 * サムネイル画像をフィルタ
+	 */
+	public function of_filter_thumbnail_images( $html ) {
+		return $this->of_filter_lazy_attributes( $html );
 	}
 }
 
