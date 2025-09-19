@@ -612,19 +612,34 @@ class Cache_Yamero {
 	 * 管理メニューを装飾（バッジ付与）
 	 */
 	public function of_decorate_admin_menu() {
-		global $submenu;
+		global $submenu, $menu;
 
 		// 管理画面以外では何もしない
 		if ( ! is_admin() ) {
 			return;
 		}
 
-		// $submenu が存在し、設定メニューが存在するかチェック
+		$state = $this->of_get_admin_menu_state();
+
+		// 親メニュー「設定」にドット追加
+		if ( isset( $menu ) && is_array( $menu ) ) {
+			foreach ( $menu as $key => $menu_item ) {
+				if ( isset( $menu_item[2] ) && 'options-general.php' === $menu_item[2] ) {
+					// 既にドットが含まれている場合は二重で追加しない
+					if ( false === strpos( $menu_item[0], 'cy-state-dot' ) ) {
+						$dot_html = '<span class="cy-state-dot" data-status="' . esc_attr( $state['status'] ) . '"></span>';
+						$screen_reader_html = '<span class="screen-reader-text">Cache Yamero: ' . esc_html( $state['label'] ) . '</span>';
+						$menu[ $key ][0] .= $dot_html . $screen_reader_html;
+					}
+					break;
+				}
+			}
+		}
+
+		// 子メニュー「Cache Yamero」にバッジ追加（既存処理）
 		if ( ! isset( $submenu['options-general.php'] ) || ! is_array( $submenu['options-general.php'] ) ) {
 			return;
 		}
-
-		$state = $this->of_get_admin_menu_state();
 
 		// cache-yamero のメニュー項目を検索
 		foreach ( $submenu['options-general.php'] as $key => $menu_item ) {
@@ -654,9 +669,22 @@ class Cache_Yamero {
 
 		// バッジのベースCSS（常時出力）
 		echo '.cy-badge{display:inline-block;margin-left:.4em;padding:.08em .45em;border-radius:1em;font-size:11px;line-height:1.9;}';
-		echo '.cy-badge[data-status="active"], .cy-badge[data-status="pending"]{background:#d63638;color:#fff;}';
-		echo '.cy-badge[data-status="disabled"], .cy-badge[data-status="ended"]{background:#1d2327;color:#fff;border:1px solid rgba(255,255,255,.15);}';
 		echo '#adminmenu .settings_page_cache-yamero .cy-badge{vertical-align:middle;}';
+
+		// 親ドットのベースCSS
+		echo '#adminmenu .menu-top > a .cy-state-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-left:.5em;vertical-align:middle;}';
+
+		// 新仕様の配色マップ（バッジ）
+		echo '.cy-badge[data-status="active"]{background:#d63638;color:#fff;}';
+		echo '.cy-badge[data-status="pending"]{background:#dba617;color:#fff;}';
+		echo '.cy-badge[data-status="ended"]{background:#8a8f98;color:#fff;}';
+		echo '.cy-badge[data-status="disabled"]{background:#1d2327;color:#fff;border:1px solid rgba(255,255,255,.15);}';
+
+		// 新仕様の配色マップ（親ドット）
+		echo '.cy-state-dot[data-status="active"]{background:#d63638;}';
+		echo '.cy-state-dot[data-status="pending"]{background:#dba617;}';
+		echo '.cy-state-dot[data-status="ended"]{background:#8a8f98;}';
+		echo '.cy-state-dot[data-status="disabled"]{background:#1d2327;box-shadow:inset 0 0 0 1px rgba(255,255,255,.15);}';
 
 		// 背景が赤の場合のみメニュー背景色を出力
 		if ( 'red' === $state['bg'] ) {
