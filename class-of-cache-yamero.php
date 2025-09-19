@@ -22,6 +22,8 @@ class OF_Cache_Yamero {
 		add_action( 'init', array( $this, 'of_init' ) );
 		add_action( 'admin_menu', array( $this, 'of_add_admin_menu' ) );
 		add_action( 'admin_init', array( $this, 'of_admin_init' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'of_enqueue_admin_menu_script' ) );
+		add_action( 'admin_footer', array( $this, 'of_admin_footer_menu_decorator' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'of_enqueue_scripts' ) );
 		$this->of_init_resource_hooks();
 	}
@@ -67,6 +69,30 @@ class OF_Cache_Yamero {
 		// メニュー装飾とCSS注入のフックを追加
 		add_action( 'admin_menu', array( $this, 'of_decorate_admin_menu' ), 1000 );
 		add_action( 'admin_head', array( $this, 'of_admin_head_styles' ) );
+	}
+	/**
+	 * 管理メニュー用スクリプトを登録・ローカライズ
+	 */
+	public function of_enqueue_admin_menu_script() {
+		if ( ! is_admin() ) {
+			return;
+		}
+		wp_register_script( 'cache-yamero-admin-menu', '', array(), CACHE_YAMERO_VERSION, true );
+		wp_enqueue_script( 'cache-yamero-admin-menu' );
+		$state = $this->of_get_admin_menu_state();
+		wp_localize_script(
+			'cache-yamero-admin-menu',
+			'CacheYameroAdminState',
+			array(
+				'status' => $state['status'],
+				'label'  => $state['label'],
+				'srText' => sprintf(
+					/* translators: %s: Cache Yamero status label */
+					__( 'Cache Yamero: %s', 'cache-yamero' ),
+					$state['label']
+				),
+			)
+		);
 	}
 	/**
 	 * 管理画面初期化
@@ -682,62 +708,92 @@ class OF_Cache_Yamero {
 	 * 管理メニューDOM装飾用JS出力
 	 */
 	public function of_decorate_admin_menu() {
-		// 管理画面以外では何もしない
-		if ( ! is_admin() ) {
-			return;
-		}
-
-		add_action( 'admin_footer', array( $this, 'of_admin_footer_menu_decorator' ) );
+		// 互換性維持のためにフックのみ保持（装飾処理は別フックで実行）。
 	}
 
 	/**
 	 * admin_footerでDOM装飾用JavaScriptを出力
 	 */
 	public function of_admin_footer_menu_decorator() {
-		$state = $this->of_get_admin_menu_state();
-
-		// 翻訳対応のスクリーンリーダー文字列
-		$screen_reader_text = sprintf(
-			/* translators: %s: Cache Yamero status label */
-			__( 'Cache Yamero: %s', 'cache-yamero' ),
-			$state['label']
-		);
+		if ( ! is_admin() || ! wp_script_is( 'cache-yamero-admin-menu', 'enqueued' ) ) {
+			return;
+		}
 		?>
 		<script type="text/javascript">
 		(function() {
 			'use strict';
 
-			var state = <?php echo wp_json_encode( $state ); ?>;
-			var screenReaderText = <?php echo wp_json_encode( $screen_reader_text ); ?>;
-			var srClass = 'cy-screen-reader-text';
-
-			var settingsMenuName = document.querySelector('#menu-settings > a .wp-menu-name');
-			if (settingsMenuName && (state.status === 'active' || state.status === 'pending')) {
-				if (!settingsMenuName.querySelector('.cy-state-dot')) {
-					var dot = document.createElement('span');
-					dot.className = 'cy-state-dot';
-					dot.setAttribute('data-status', state.status);
-					dot.setAttribute('aria-hidden', 'true');
-					settingsMenuName.appendChild(dot);
-				}
-				if (!settingsMenuName.querySelector('.' + srClass)) {
-					var sr = document.createElement('span');
-					sr.className = 'screen-reader-text ' + srClass;
-					sr.textContent = screenReaderText;
-					settingsMenuName.appendChild(sr);
-				}
+			const state = window.CacheYameroAdminState;
+			if ( ! state || ! state.status || ! state.label ) {
+				return;
 			}
 
-			var submenuName = document.querySelector('#adminmenu .settings_page_cache-yamero > a .wp-menu-name');
-			if (submenuName && !submenuName.querySelector('.cy-badge')) {
-				var badge = document.createElement('span');
-				badge.className = 'cy-badge';
-				badge.setAttribute('data-status', state.status);
-				var badgeText = document.createElement('span');
-				badgeText.className = 'cy-badge-text';
+			const srText = state.srText || 'Cache Yamero: ' + state.label;
+			const maxRetry = 60;
+			const raf = window.requestAnimationFrame || function( callback ) {
+				return window.setTimeout( callback, 16 );
+			};
+
+			function ensureScreenReader( target, className ) {
+				let reader = target.querySelector( '.' + className );
+				if ( ! reader ) {
+					reader = document.createElement( 'span' );
+					reader.className = 'screen-reader-text ' + className;
+					target.appendChild( reader );
+				}
+				reader.textContent = srText;
+			}
+
+			function applyState( attempt ) {
+				const settingsLink = document.querySelector( '#menu-settings > a' );
+				const submenuLink = document.querySelector( '#adminmenu a[href*="page=cache-yamero"]' );
+
+				if ( ! settingsLink || ! submenuLink ) {
+					if ( attempt < maxRetry ) {
+						raf( function() {
+							applyState( attempt + 1 );
+						} );
+					}
+					return;
+				}
+
+				let dot = settingsLink.querySelector( '.cy-state-dot' );
+				if ( ! dot ) {
+					dot = document.createElement( 'span' );
+					dot.className = 'cy-state-dot';
+					dot.setAttribute( 'aria-hidden', 'true' );
+					settingsLink.appendChild( dot );
+				}
+				dot.setAttribute( 'data-status', state.status );
+				ensureScreenReader( settingsLink, 'cy-state-sr' );
+
+				let badge = submenuLink.querySelector( '.cy-badge' );
+				if ( ! badge ) {
+					badge = document.createElement( 'span' );
+					badge.className = 'cy-badge';
+					submenuLink.appendChild( badge );
+				}
+				badge.setAttribute( 'data-status', state.status );
+
+				let badgeText = badge.querySelector( '.cy-badge-text' );
+				if ( ! badgeText ) {
+					badgeText = document.createElement( 'span' );
+					badgeText.className = 'cy-badge-text';
+					badge.appendChild( badgeText );
+				}
 				badgeText.textContent = state.label;
-				badge.appendChild(badgeText);
-				submenuName.appendChild(badge);
+
+				ensureScreenReader( submenuLink, 'cy-badge-sr' );
+			}
+
+			function start() {
+				applyState( 0 );
+			}
+
+			if ( 'loading' === document.readyState ) {
+				document.addEventListener( 'DOMContentLoaded', start );
+			} else {
+				start();
 			}
 		})();
 		</script>
@@ -757,13 +813,12 @@ class OF_Cache_Yamero {
 
 		echo '<style type="text/css">';
 
-		// バッジのベースCSS（常時出力）
-		echo '#adminmenu #menu-settings > a .wp-menu-name, #adminmenu .settings_page_cache-yamero > a .wp-menu-name{display:inline-flex;align-items:center;gap:.45em;white-space:nowrap;}';
-		echo '.cy-badge{display:inline-flex;align-items:center;margin-left:.4em;padding:.08em .45em;border-radius:1em;font-size:11px;line-height:1.9;flex-shrink:0;}';
+		// バッジとドットの基本スタイル
+		echo '#menu-settings > a{position:relative;}';
+		echo '.cy-state-dot{position:absolute;top:50%;right:10px;transform:translateY(-50%);width:6px;height:6px;border-radius:50%;pointer-events:none;}';
+		echo '#adminmenu a[href*="page=cache-yamero"]{position:relative;}';
+		echo '.cy-badge{position:absolute;top:50%;right:8px;transform:translateY(-50%);display:inline-block;border-radius:1em;padding:.08em .45em;font-size:11px;line-height:1.9;}';
 		echo '.cy-badge-text{display:inline-block;}';
-
-		// 親ドットのベースCSS
-		echo '#adminmenu #menu-settings > a .wp-menu-name .cy-state-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-left:.3em;flex-shrink:0;}';
 
 		// 新仕様の配色マップ（バッジ）
 		echo '.cy-badge[data-status="active"]{background:#d63638;color:#fff;}';
