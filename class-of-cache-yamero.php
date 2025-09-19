@@ -718,6 +718,8 @@ class OF_Cache_Yamero {
 		if ( ! is_admin() || ! wp_script_is( 'cache-yamero-admin-menu', 'enqueued' ) ) {
 			return;
 		}
+
+		$state = $this->of_get_admin_menu_state();
 		?>
 		<script type="text/javascript">
 		(function() {
