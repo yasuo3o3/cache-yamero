@@ -621,8 +621,8 @@ class Cache_Yamero {
 
 		$state = $this->of_get_admin_menu_state();
 
-		// 親メニュー「設定」にドット追加
-		if ( isset( $menu ) && is_array( $menu ) ) {
+		// 親メニュー「設定」にドット追加（active/pending時のみ）
+		if ( isset( $menu ) && is_array( $menu ) && in_array( $state['status'], [ 'active', 'pending' ], true ) ) {
 			foreach ( $menu as $key => $menu_item ) {
 				if ( isset( $menu_item[2] ) && 'options-general.php' === $menu_item[2] ) {
 					// 既にドットが含まれている場合は二重で追加しない
