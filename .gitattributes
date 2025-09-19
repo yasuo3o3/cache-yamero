@@ -104,6 +104,11 @@ DEVELOPER.md export-ignore
 TESTING.md export-ignore
 TODO.md export-ignore
 docs/ export-ignore
+AGENTS.md export-ignore
+YASUO3O3.md export-ignore
+CLAUDE.md export-ignore
+NETSERVICE.md export-ignore
+WORDPRESS.md export-ignore
 
 # Testing
 tests/ export-ignore
@@ -156,15 +161,20 @@ development/ export-ignore
 *.crt export-ignore
 
 # SVN specific files
-tags/ export-ignore
-branches/ export-ignore
-trunk/ export-ignore
+tags/   export-ignore
+branches/   export-ignore
+trunk/  export-ignore
 
-docs/ export-ignore
+docs/   export-ignore
 
 # Claude Code specific
-.claude/ export-ignore
-.history/ export-ignore
+.claude/    export-ignore
+.history/   export-ignore
 
-debug-tools/ export-ignore
+debug-tools/    export-ignore
+
+.gitignore export-ignore
+.distignore export-ignore
+.gitattributes export-ignore
+.gitmodules export-ignore
 
