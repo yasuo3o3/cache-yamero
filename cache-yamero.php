@@ -83,6 +83,9 @@ class Cache_Yamero {
 			'cache-yamero',
 			[ $this, 'of_admin_page' ]
 		);
+		// メニュー装飾とCSS注入のフックを追加
+		add_action( 'admin_menu', [ $this, 'of_decorate_admin_menu' ], 1000 );
+		add_action( 'admin_head', [ $this, 'of_admin_head_styles' ] );
 	}
 	/**
 	 * 管理画面初期化
@@ -550,6 +553,118 @@ class Cache_Yamero {
 			return '';
 		}
 		return $parsed->format( 'Y-m-d\TH:i' );
+	}
+
+	/**
+	 * 管理メニューの状態を取得
+	 *
+	 * @return array 状態情報配列 ['bg' => 'red'|'black', 'label' => 'ラベル', 'status' => 'active'|'pending'|'disabled'|'ended']
+	 */
+	private function of_get_admin_menu_state() {
+		$enabled = get_option( 'of_cache_yamero_enabled', false );
+		$now = current_time( 'timestamp' );
+		$start_datetime = get_option( 'of_cache_yamero_start_datetime', '' );
+		$end_datetime = get_option( 'of_cache_yamero_end_datetime', '' );
+
+		$start_ts = ! empty( $start_datetime ) ? strtotime( $start_datetime ) : null;
+		$end_ts = ! empty( $end_datetime ) ? strtotime( $end_datetime ) : null;
+
+		// 言語判定（get_locale()がen_で始まるかどうか）
+		$is_english = ( 0 === strpos( get_locale(), 'en_' ) );
+
+		// 状態判定の優先順位
+		if ( ! $enabled ) {
+			// 有効チェックOFF
+			return [
+				'bg' => 'black',
+				'label' => $is_english ? 'Disabled' : '無効',
+				'status' => 'disabled'
+			];
+		}
+
+		if ( $end_ts && $now >= $end_ts ) {
+			// 有効チェックON かつ 終了時刻を過ぎている
+			return [
+				'bg' => 'black',
+				'label' => $is_english ? 'Ended' : '終了',
+				'status' => 'ended'
+			];
+		}
+
+		if ( $start_ts && $now < $start_ts ) {
+			// 有効チェックON かつ 開始時刻前
+			return [
+				'bg' => 'red',
+				'label' => $is_english ? 'Pending' : '待機',
+				'status' => 'pending'
+			];
+		}
+
+		// 上記以外（有効状態）
+		return [
+			'bg' => 'red',
+			'label' => $is_english ? 'Active' : '有効',
+			'status' => 'active'
+		];
+	}
+
+	/**
+	 * 管理メニューを装飾（バッジ付与）
+	 */
+	public function of_decorate_admin_menu() {
+		global $submenu;
+
+		// 管理画面以外では何もしない
+		if ( ! is_admin() ) {
+			return;
+		}
+
+		// $submenu が存在し、設定メニューが存在するかチェック
+		if ( ! isset( $submenu['options-general.php'] ) || ! is_array( $submenu['options-general.php'] ) ) {
+			return;
+		}
+
+		$state = $this->of_get_admin_menu_state();
+
+		// cache-yamero のメニュー項目を検索
+		foreach ( $submenu['options-general.php'] as $key => $menu_item ) {
+			if ( isset( $menu_item[2] ) && 'cache-yamero' === $menu_item[2] ) {
+				// 既にバッジが含まれている場合は二重で追加しない
+				if ( false === strpos( $menu_item[0], 'cy-badge' ) ) {
+					$badge_html = '<span class="cy-badge" data-status="' . esc_attr( $state['status'] ) . '"><span class="cy-badge-text">' . esc_html( $state['label'] ) . '</span></span>';
+					$submenu['options-general.php'][ $key ][0] .= $badge_html;
+				}
+				break;
+			}
+		}
+	}
+
+	/**
+	 * 管理画面ヘッダーにスタイルを追加
+	 */
+	public function of_admin_head_styles() {
+		// 管理画面以外では何もしない
+		if ( ! is_admin() ) {
+			return;
+		}
+
+		$state = $this->of_get_admin_menu_state();
+
+		echo '<style type="text/css">';
+
+		// バッジのベースCSS（常時出力）
+		echo '.cy-badge{display:inline-block;margin-left:.4em;padding:.08em .45em;border-radius:1em;font-size:11px;line-height:1.9;}';
+		echo '.cy-badge[data-status="active"], .cy-badge[data-status="pending"]{background:#d63638;color:#fff;}';
+		echo '.cy-badge[data-status="disabled"], .cy-badge[data-status="ended"]{background:#1d2327;color:#fff;border:1px solid rgba(255,255,255,.15);}';
+		echo '#adminmenu .settings_page_cache-yamero .cy-badge{vertical-align:middle;}';
+
+		// 背景が赤の場合のみメニュー背景色を出力
+		if ( 'red' === $state['bg'] ) {
+			echo '#adminmenu .settings_page_cache-yamero > a{background:#d63638 !important;color:#fff !important;}';
+			echo '#adminmenu .settings_page_cache-yamero > a:hover{background:#b32d2e !important;}';
+		}
+
+		echo '</style>';
 	}
 }
 // プラグイン初期化
