@@ -280,7 +280,7 @@ class OF_Cache_Yamero {
 		wp_enqueue_script(
 			'cache-yamero',
 			CACHE_YAMERO_PLUGIN_URL . 'assets/js/cache-yamero.js',
-			[],
+			array(),
 			CACHE_YAMERO_VERSION,
 			true
 		);
@@ -329,7 +329,8 @@ class OF_Cache_Yamero {
 		if ( empty( $start_datetime ) && empty( $end_datetime ) ) {
 			return true;
 		}
-		$current_time = current_time( 'timestamp' );
+		// time()を使用してUnixエポック時刻で比較（タイムゾーン影響を排除）
+		$current_time = time();
 		if ( ! empty( $start_datetime ) ) {
 			$start_time = strtotime( $start_datetime );
 			if ( $current_time < $start_time ) {
@@ -348,7 +349,14 @@ class OF_Cache_Yamero {
 	 * リソースフックの初期化
 	 */
 	private function of_init_resource_hooks() {
-		$priority = apply_filters( 'of_cache_yamero_loader_priority', 10 );
+		// 旧フック名の互換性サポート（非推奨）
+		$legacy_priority = apply_filters_deprecated(
+			'cache_yamero_loader_priority',
+			array( 10 ),
+			'1.1.0',
+			'of_cache_yamero_loader_priority'
+		);
+		$priority = apply_filters( 'of_cache_yamero_loader_priority', $legacy_priority );
 		add_filter( 'style_loader_src', array( $this, 'of_add_cache_param_to_style' ), $priority );
 		add_filter( 'script_loader_src', array( $this, 'of_add_cache_param_to_script' ), $priority );
 		add_filter( 'wp_get_attachment_url', array( $this, 'of_add_cache_param_to_attachment_url' ), $priority );
@@ -604,7 +612,8 @@ class OF_Cache_Yamero {
 	 */
 	private function of_get_admin_menu_state() {
 		$enabled = get_option( 'of_cache_yamero_enabled', false );
-		$now = current_time( 'timestamp' );
+		// time()を使用してUnixエポック時刻で比較（タイムゾーン影響を排除）
+		$now = time();
 		$start_datetime = get_option( 'of_cache_yamero_start_datetime', '' );
 		$end_datetime = get_option( 'of_cache_yamero_end_datetime', '' );
 
