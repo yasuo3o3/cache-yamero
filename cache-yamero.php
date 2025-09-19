@@ -33,7 +33,7 @@ define( 'CACHE_YAMERO_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 /**
  * Cache Yamero メインクラス
  */
-class Cache_Yamero {
+class OF_Cache_Yamero {
 	/**
 	 * プラグイン初期化
 	 */
@@ -109,7 +109,37 @@ class Cache_Yamero {
 		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_url_cleanup', [
 			'sanitize_callback' => 'absint',
 		] );
+		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_apply_css', [
+			'sanitize_callback' => 'absint',
+		] );
+		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_apply_js', [
+			'sanitize_callback' => 'absint',
+		] );
+		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_apply_images', [
+			'sanitize_callback' => 'absint',
+		] );
 	}
+	/**
+	 * 設定値を一括取得（キャッシュ対応）
+	 */
+	private function of_get_cached_options() {
+		static $options = null;
+		if ( null === $options ) {
+			$options = [
+				'enabled'           => get_option( 'of_cache_yamero_enabled', false ),
+				'scope'             => get_option( 'of_cache_yamero_scope', 'admin_only' ),
+				'start_datetime'    => get_option( 'of_cache_yamero_start_datetime', '' ),
+				'end_datetime'      => get_option( 'of_cache_yamero_end_datetime', '' ),
+				'get_form_support'  => get_option( 'of_cache_yamero_get_form_support', true ),
+				'url_cleanup'       => get_option( 'of_cache_yamero_url_cleanup', true ),
+				'apply_css'         => get_option( 'of_cache_yamero_apply_css', true ),
+				'apply_js'          => get_option( 'of_cache_yamero_apply_js', true ),
+				'apply_images'      => get_option( 'of_cache_yamero_apply_images', true ),
+			];
+		}
+		return $options;
+	}
+
 	/**
 	 * 管理画面設定ページ
 	 */
@@ -133,15 +163,16 @@ class Cache_Yamero {
 			update_option( 'of_cache_yamero_apply_images', isset( $_POST['of_cache_yamero_apply_images'] ) ? 1 : 0 );
 			echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( '設定を保存しました。', 'cache-yamero' ) . '</p></div>';
 		}
-		$enabled           = get_option( 'of_cache_yamero_enabled', false );
-		$scope             = get_option( 'of_cache_yamero_scope', 'admin_only' );
-		$start_datetime    = get_option( 'of_cache_yamero_start_datetime', '' );
-		$end_datetime      = get_option( 'of_cache_yamero_end_datetime', '' );
-		$get_form_support  = get_option( 'of_cache_yamero_get_form_support', true );
-		$url_cleanup       = get_option( 'of_cache_yamero_url_cleanup', true );
-		$apply_css         = get_option( 'of_cache_yamero_apply_css', true );
-		$apply_js          = get_option( 'of_cache_yamero_apply_js', true );
-		$apply_images      = get_option( 'of_cache_yamero_apply_images', true );
+		$options = $this->of_get_cached_options();
+		$enabled           = $options['enabled'];
+		$scope             = $options['scope'];
+		$start_datetime    = $options['start_datetime'];
+		$end_datetime      = $options['end_datetime'];
+		$get_form_support  = $options['get_form_support'];
+		$url_cleanup       = $options['url_cleanup'];
+		$apply_css         = $options['apply_css'];
+		$apply_js          = $options['apply_js'];
+		$apply_images      = $options['apply_images'];
 		?>
 		<div class="wrap">
 			<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
@@ -548,11 +579,22 @@ class Cache_Yamero {
 		if ( empty( $datetime ) ) {
 			return '';
 		}
-		$parsed = DateTime::createFromFormat( 'Y-m-d\TH:i', $datetime );
-		if ( false === $parsed ) {
-			return '';
+
+		// PHP 5.3+ DateTime::createFromFormat の安全なフォールバック
+		if ( class_exists( 'DateTime' ) && method_exists( 'DateTime', 'createFromFormat' ) ) {
+			$parsed = DateTime::createFromFormat( 'Y-m-d\TH:i', $datetime );
+			if ( false !== $parsed ) {
+				return $parsed->format( 'Y-m-d\TH:i' );
+			}
 		}
-		return $parsed->format( 'Y-m-d\TH:i' );
+
+		// フォールバック: strtotime での基本検証
+		$timestamp = strtotime( $datetime );
+		if ( false !== $timestamp ) {
+			return gmdate( 'Y-m-d\TH:i', $timestamp );
+		}
+
+		return '';
 	}
 
 	/**
@@ -570,7 +612,8 @@ class Cache_Yamero {
 		$end_ts = ! empty( $end_datetime ) ? strtotime( $end_datetime ) : null;
 
 		// 言語判定（get_locale()がen_で始まるかどうか）
-		$is_english = ( 0 === strpos( get_locale(), 'en_' ) );
+		$locale = get_locale();
+		$is_english = ( 0 === strpos( $locale, 'en_' ) || 'en' === $locale );
 
 		// 状態判定の優先順位
 		if ( ! $enabled ) {
@@ -696,4 +739,4 @@ class Cache_Yamero {
 	}
 }
 // プラグイン初期化
-new Cache_Yamero();
+new OF_Cache_Yamero();
