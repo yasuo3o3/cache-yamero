@@ -723,10 +723,12 @@ class OF_Cache_Yamero {
 		(function() {
 			'use strict';
 
-			const state = window.CacheYameroAdminState;
+			const fallbackState = <?php echo wp_json_encode( $state ); ?>;
+			const state = window.CacheYameroAdminState ? Object.assign( {}, fallbackState, window.CacheYameroAdminState ) : fallbackState;
 			if ( ! state || ! state.status || ! state.label ) {
 				return;
 			}
+			window.CacheYameroAdminState = state;
 
 			const srText = state.srText || 'Cache Yamero: ' + state.label;
 			const maxRetry = 60;
