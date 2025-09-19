@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Cache Yamero メインクラス
  */
-class Of_Cache_Yamero {
+class OF_Cache_Yamero {
 	/**
 	 * プラグイン初期化
 	 */
@@ -37,15 +37,15 @@ class Of_Cache_Yamero {
 	 */
 	private function of_set_default_options() {
 		$defaults = array(
-			'enabled'           => false,
-			'scope'             => 'admin_only',
-			'start_datetime'    => '',
-			'end_datetime'      => '',
-			'get_form_support'  => true,
-			'url_cleanup'       => true,
-			'apply_css'         => true,
-			'apply_js'          => true,
-			'apply_images'      => true,
+			'enabled'          => false,
+			'scope'            => 'admin_only',
+			'start_datetime'   => '',
+			'end_datetime'     => '',
+			'get_form_support' => true,
+			'url_cleanup'      => true,
+			'apply_css'        => true,
+			'apply_js'         => true,
+			'apply_images'     => true,
 		);
 		foreach ( $defaults as $key => $value ) {
 			if ( false === get_option( 'of_cache_yamero_' . $key ) ) {
@@ -72,33 +72,69 @@ class Of_Cache_Yamero {
 	 * 管理画面初期化
 	 */
 	public function of_admin_init() {
-		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_enabled', array(
-			'sanitize_callback' => 'absint',
-		) );
-		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_scope', array(
-			'sanitize_callback' => 'sanitize_text_field',
-		) );
-		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_start_datetime', array(
-			'sanitize_callback' => 'sanitize_text_field',
-		) );
-		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_end_datetime', array(
-			'sanitize_callback' => 'sanitize_text_field',
-		) );
-		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_get_form_support', array(
-			'sanitize_callback' => 'absint',
-		) );
-		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_url_cleanup', array(
-			'sanitize_callback' => 'absint',
-		) );
-		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_apply_css', array(
-			'sanitize_callback' => 'absint',
-		) );
-		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_apply_js', array(
-			'sanitize_callback' => 'absint',
-		) );
-		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_apply_images', array(
-			'sanitize_callback' => 'absint',
-		) );
+		register_setting(
+			'of_cache_yamero_settings',
+			'of_cache_yamero_enabled',
+			array(
+				'sanitize_callback' => 'absint',
+			)
+		);
+		register_setting(
+			'of_cache_yamero_settings',
+			'of_cache_yamero_scope',
+			array(
+				'sanitize_callback' => 'sanitize_text_field',
+			)
+		);
+		register_setting(
+			'of_cache_yamero_settings',
+			'of_cache_yamero_start_datetime',
+			array(
+				'sanitize_callback' => 'sanitize_text_field',
+			)
+		);
+		register_setting(
+			'of_cache_yamero_settings',
+			'of_cache_yamero_end_datetime',
+			array(
+				'sanitize_callback' => 'sanitize_text_field',
+			)
+		);
+		register_setting(
+			'of_cache_yamero_settings',
+			'of_cache_yamero_get_form_support',
+			array(
+				'sanitize_callback' => 'absint',
+			)
+		);
+		register_setting(
+			'of_cache_yamero_settings',
+			'of_cache_yamero_url_cleanup',
+			array(
+				'sanitize_callback' => 'absint',
+			)
+		);
+		register_setting(
+			'of_cache_yamero_settings',
+			'of_cache_yamero_apply_css',
+			array(
+				'sanitize_callback' => 'absint',
+			)
+		);
+		register_setting(
+			'of_cache_yamero_settings',
+			'of_cache_yamero_apply_js',
+			array(
+				'sanitize_callback' => 'absint',
+			)
+		);
+		register_setting(
+			'of_cache_yamero_settings',
+			'of_cache_yamero_apply_images',
+			array(
+				'sanitize_callback' => 'absint',
+			)
+		);
 	}
 	/**
 	 * 設定値を一括取得（キャッシュ対応）
@@ -107,15 +143,15 @@ class Of_Cache_Yamero {
 		static $options = null;
 		if ( null === $options ) {
 			$options = array(
-				'enabled'           => get_option( 'of_cache_yamero_enabled', false ),
-				'scope'             => get_option( 'of_cache_yamero_scope', 'admin_only' ),
-				'start_datetime'    => get_option( 'of_cache_yamero_start_datetime', '' ),
-				'end_datetime'      => get_option( 'of_cache_yamero_end_datetime', '' ),
-				'get_form_support'  => get_option( 'of_cache_yamero_get_form_support', true ),
-				'url_cleanup'       => get_option( 'of_cache_yamero_url_cleanup', true ),
-				'apply_css'         => get_option( 'of_cache_yamero_apply_css', true ),
-				'apply_js'          => get_option( 'of_cache_yamero_apply_js', true ),
-				'apply_images'      => get_option( 'of_cache_yamero_apply_images', true ),
+				'enabled'          => get_option( 'of_cache_yamero_enabled', false ),
+				'scope'            => get_option( 'of_cache_yamero_scope', 'admin_only' ),
+				'start_datetime'   => get_option( 'of_cache_yamero_start_datetime', '' ),
+				'end_datetime'     => get_option( 'of_cache_yamero_end_datetime', '' ),
+				'get_form_support' => get_option( 'of_cache_yamero_get_form_support', true ),
+				'url_cleanup'      => get_option( 'of_cache_yamero_url_cleanup', true ),
+				'apply_css'        => get_option( 'of_cache_yamero_apply_css', true ),
+				'apply_js'         => get_option( 'of_cache_yamero_apply_js', true ),
+				'apply_images'     => get_option( 'of_cache_yamero_apply_images', true ),
 			);
 		}
 		return $options;
@@ -144,16 +180,16 @@ class Of_Cache_Yamero {
 			update_option( 'of_cache_yamero_apply_images', isset( $_POST['of_cache_yamero_apply_images'] ) ? 1 : 0 );
 			echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( '設定を保存しました。', 'cache-yamero' ) . '</p></div>';
 		}
-		$options = $this->of_get_cached_options();
-		$enabled           = $options['enabled'];
-		$scope             = $options['scope'];
-		$start_datetime    = $options['start_datetime'];
-		$end_datetime      = $options['end_datetime'];
-		$get_form_support  = $options['get_form_support'];
-		$url_cleanup       = $options['url_cleanup'];
-		$apply_css         = $options['apply_css'];
-		$apply_js          = $options['apply_js'];
-		$apply_images      = $options['apply_images'];
+		$options          = $this->of_get_cached_options();
+		$enabled          = $options['enabled'];
+		$scope            = $options['scope'];
+		$start_datetime   = $options['start_datetime'];
+		$end_datetime     = $options['end_datetime'];
+		$get_form_support = $options['get_form_support'];
+		$url_cleanup      = $options['url_cleanup'];
+		$apply_css        = $options['apply_css'];
+		$apply_js         = $options['apply_js'];
+		$apply_images     = $options['apply_images'];
 		?>
 		<div class="wrap">
 			<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
@@ -270,9 +306,9 @@ class Of_Cache_Yamero {
 			'cache-yamero',
 			'cacheYamero',
 			array(
-				'enabled'         => $this->of_is_enabled(),
-				'getFormSupport'  => (bool) get_option( 'of_cache_yamero_get_form_support', true ),
-				'urlCleanup'      => (bool) get_option( 'of_cache_yamero_url_cleanup', true ),
+				'enabled'        => $this->of_is_enabled(),
+				'getFormSupport' => (bool) get_option( 'of_cache_yamero_get_form_support', true ),
+				'urlCleanup'     => (bool) get_option( 'of_cache_yamero_url_cleanup', true ),
 			)
 		);
 	}
@@ -310,7 +346,7 @@ class Of_Cache_Yamero {
 		if ( empty( $start_datetime ) && empty( $end_datetime ) ) {
 			return true;
 		}
-		// time()を使用してUnixエポック時刻で比較（タイムゾーン影響を排除）
+		// Unixエポック秒で比較しタイムゾーン差異を避ける
 		$current_time = time();
 		if ( ! empty( $start_datetime ) ) {
 			$start_time = strtotime( $start_datetime );
@@ -337,7 +373,7 @@ class Of_Cache_Yamero {
 			'1.1.0',
 			'of_cache_yamero_loader_priority'
 		);
-		$priority = apply_filters( 'of_cache_yamero_loader_priority', $legacy_priority );
+		$priority        = apply_filters( 'of_cache_yamero_loader_priority', $legacy_priority );
 		add_filter( 'style_loader_src', array( $this, 'of_add_cache_param_to_style' ), $priority );
 		add_filter( 'script_loader_src', array( $this, 'of_add_cache_param_to_script' ), $priority );
 		add_filter( 'wp_get_attachment_url', array( $this, 'of_add_cache_param_to_attachment_url' ), $priority );
@@ -380,9 +416,9 @@ class Of_Cache_Yamero {
 			return $url;
 		}
 		if ( $resource_type ) {
-			$defaults = array(
-				'css' => true,
-				'js' => true,
+			$defaults      = array(
+				'css'    => true,
+				'js'     => true,
 				'images' => true,
 			);
 			$default_value = isset( $defaults[ $resource_type ] ) ? $defaults[ $resource_type ] : true;
@@ -402,7 +438,7 @@ class Of_Cache_Yamero {
 			wp_parse_str( $parsed['query'], $query_args );
 		}
 		$query_args['cache-yamero'] = $this->of_get_request_timestamp();
-		$new_url = '';
+		$new_url                    = '';
 		if ( ! empty( $parsed['scheme'] ) ) {
 			$new_url .= $parsed['scheme'] . '://';
 		}
@@ -428,7 +464,7 @@ class Of_Cache_Yamero {
 		if ( empty( $srcset ) || ! $this->of_is_active_for_current_user() ) {
 			return $srcset;
 		}
-		$sources = explode( ',', $srcset );
+		$sources         = explode( ',', $srcset );
 		$updated_sources = array();
 		foreach ( $sources as $source ) {
 			$source = trim( $source );
@@ -437,8 +473,8 @@ class Of_Cache_Yamero {
 			}
 			$parts = preg_split( '/\s+/', $source, 2 );
 			if ( ! empty( $parts[0] ) ) {
-				$url = $this->of_add_cache_param_to_url( $parts[0], $resource_type );
-				$descriptor = isset( $parts[1] ) ? ' ' . $parts[1] : '';
+				$url               = $this->of_add_cache_param_to_url( $parts[0], $resource_type );
+				$descriptor        = isset( $parts[1] ) ? ' ' . $parts[1] : '';
 				$updated_sources[] = $url . $descriptor;
 			}
 		}
@@ -455,7 +491,7 @@ class Of_Cache_Yamero {
 		foreach ( $lazy_attrs as $attr ) {
 			$html = preg_replace_callback(
 				'/(<(?:img|source)[^>]*\s' . preg_quote( $attr, '/' ) . '=")([^"]+)(")/i',
-				function( $matches ) use ( $attr ) {
+				function ( $matches ) use ( $attr ) {
 					$url = $matches[2];
 					if ( 'data-srcset' === $attr ) {
 						$new_url = $this->of_add_cache_param_to_srcset( $url, 'images' );
@@ -469,14 +505,14 @@ class Of_Cache_Yamero {
 		}
 		$html = preg_replace_callback(
 			'/(<(?:img|source)[^>]*\ssrc=")([^"]+)(")/i',
-			function( $matches ) {
+			function ( $matches ) {
 				return $matches[1] . $this->of_add_cache_param_to_url( $matches[2], 'images' ) . $matches[3];
 			},
 			$html
 		);
 		$html = preg_replace_callback(
 			'/(<(?:img|source)[^>]*\ssrcset=")([^"]+)(")/i',
-			function( $matches ) {
+			function ( $matches ) {
 				return $matches[1] . $this->of_add_cache_param_to_srcset( $matches[2], 'images' ) . $matches[3];
 			},
 			$html
@@ -514,6 +550,7 @@ class Of_Cache_Yamero {
 	 * 添付ファイル画像属性をフィルタ
 	 */
 	public function of_add_cache_param_to_attachment_image_attributes( $attr, $attachment, $size ) {
+		unset( $attachment, $size );
 		if ( isset( $attr['src'] ) ) {
 			$attr['src'] = $this->of_add_cache_param_to_url( $attr['src'], 'images' );
 		}
@@ -593,51 +630,51 @@ class Of_Cache_Yamero {
 	 */
 	private function of_get_admin_menu_state() {
 		$enabled = get_option( 'of_cache_yamero_enabled', false );
-		// time()を使用してUnixエポック時刻で比較（タイムゾーン影響を排除）
-		$now = time();
+		// Unixエポック秒で比較しタイムゾーン差異を避ける
+		$now            = time();
 		$start_datetime = get_option( 'of_cache_yamero_start_datetime', '' );
-		$end_datetime = get_option( 'of_cache_yamero_end_datetime', '' );
+		$end_datetime   = get_option( 'of_cache_yamero_end_datetime', '' );
 
 		$start_ts = ! empty( $start_datetime ) ? strtotime( $start_datetime ) : null;
-		$end_ts = ! empty( $end_datetime ) ? strtotime( $end_datetime ) : null;
+		$end_ts   = ! empty( $end_datetime ) ? strtotime( $end_datetime ) : null;
 
-		// 言語判定（get_locale()がen_で始まるかどうか）
-		$locale = get_locale();
+		// 言語判定。en_* ロケールなら英語扱い
+		$locale     = get_locale();
 		$is_english = ( 0 === strpos( $locale, 'en_' ) || 'en' === $locale );
 
 		// 状態判定の優先順位
 		if ( ! $enabled ) {
 			// 有効チェックOFF
 			return array(
-				'bg' => 'black',
-				'label' => $is_english ? 'Disabled' : '無効',
-				'status' => 'disabled'
+				'bg'     => 'black',
+				'label'  => $is_english ? 'Disabled' : '無効',
+				'status' => 'disabled',
 			);
 		}
 
 		if ( $end_ts && $now >= $end_ts ) {
 			// 有効チェックON かつ 終了時刻を過ぎている
 			return array(
-				'bg' => 'black',
-				'label' => $is_english ? 'Ended' : '終了',
-				'status' => 'ended'
+				'bg'     => 'black',
+				'label'  => $is_english ? 'Ended' : '終了',
+				'status' => 'ended',
 			);
 		}
 
 		if ( $start_ts && $now < $start_ts ) {
 			// 有効チェックON かつ 開始時刻前
 			return array(
-				'bg' => 'red',
-				'label' => $is_english ? 'Pending' : '待機',
-				'status' => 'pending'
+				'bg'     => 'red',
+				'label'  => $is_english ? 'Pending' : '待機',
+				'status' => 'pending',
 			);
 		}
 
 		// 上記以外（有効状態）
 		return array(
-			'bg' => 'red',
-			'label' => $is_english ? 'Active' : '有効',
-			'status' => 'active'
+			'bg'     => 'red',
+			'label'  => $is_english ? 'Active' : '有効',
+			'status' => 'active',
 		);
 	}
 

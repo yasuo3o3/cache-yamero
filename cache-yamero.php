@@ -24,14 +24,14 @@
  */
 
 // セキュリティ: 直接アクセス防止
-if (! defined('ABSPATH')) {
-    exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 // プラグインの基本定数
-define('CACHE_YAMERO_VERSION', '1.1.0');
-define('CACHE_YAMERO_PLUGIN_FILE', __FILE__);
-define('CACHE_YAMERO_PLUGIN_DIR', plugin_dir_path(__FILE__));
-define('CACHE_YAMERO_PLUGIN_URL', plugin_dir_url(__FILE__));
+define( 'CACHE_YAMERO_VERSION', '1.1.0' );
+define( 'CACHE_YAMERO_PLUGIN_FILE', __FILE__ );
+define( 'CACHE_YAMERO_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+define( 'CACHE_YAMERO_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 // クラスファイルを読み込み
 require_once CACHE_YAMERO_PLUGIN_DIR . 'class-of-cache-yamero.php';
 // プラグイン初期化
