@@ -38,10 +38,10 @@ class OF_Cache_Yamero {
 	 * プラグイン初期化
 	 */
 	public function __construct() {
-		add_action( 'init', [ $this, 'of_init' ] );
-		add_action( 'admin_menu', [ $this, 'of_add_admin_menu' ] );
-		add_action( 'admin_init', [ $this, 'of_admin_init' ] );
-		add_action( 'wp_enqueue_scripts', [ $this, 'of_enqueue_scripts' ] );
+		add_action( 'init', array( $this, 'of_init' ) );
+		add_action( 'admin_menu', array( $this, 'of_add_admin_menu' ) );
+		add_action( 'admin_init', array( $this, 'of_admin_init' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'of_enqueue_scripts' ) );
 		$this->of_init_resource_hooks();
 	}
 	/**
@@ -55,7 +55,7 @@ class OF_Cache_Yamero {
 	 * デフォルトオプションを設定
 	 */
 	private function of_set_default_options() {
-		$defaults = [
+		$defaults = array(
 			'enabled'           => false,
 			'scope'             => 'admin_only',
 			'start_datetime'    => '',
@@ -65,7 +65,7 @@ class OF_Cache_Yamero {
 			'apply_css'         => true,
 			'apply_js'          => true,
 			'apply_images'      => true,
-		];
+		);
 		foreach ( $defaults as $key => $value ) {
 			if ( false === get_option( 'of_cache_yamero_' . $key ) ) {
 				add_option( 'of_cache_yamero_' . $key, $value, '', false );
@@ -81,43 +81,43 @@ class OF_Cache_Yamero {
 			__( 'Cache Yamero', 'cache-yamero' ),
 			'manage_options',
 			'cache-yamero',
-			[ $this, 'of_admin_page' ]
+			array( $this, 'of_admin_page' )
 		);
 		// メニュー装飾とCSS注入のフックを追加
-		add_action( 'admin_menu', [ $this, 'of_decorate_admin_menu' ], 1000 );
-		add_action( 'admin_head', [ $this, 'of_admin_head_styles' ] );
+		add_action( 'admin_menu', array( $this, 'of_decorate_admin_menu' ), 1000 );
+		add_action( 'admin_head', array( $this, 'of_admin_head_styles' ) );
 	}
 	/**
 	 * 管理画面初期化
 	 */
 	public function of_admin_init() {
-		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_enabled', [
+		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_enabled', array(
 			'sanitize_callback' => 'absint',
-		] );
-		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_scope', [
+		) );
+		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_scope', array(
 			'sanitize_callback' => 'sanitize_text_field',
-		] );
-		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_start_datetime', [
+		) );
+		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_start_datetime', array(
 			'sanitize_callback' => 'sanitize_text_field',
-		] );
-		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_end_datetime', [
+		) );
+		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_end_datetime', array(
 			'sanitize_callback' => 'sanitize_text_field',
-		] );
-		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_get_form_support', [
+		) );
+		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_get_form_support', array(
 			'sanitize_callback' => 'absint',
-		] );
-		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_url_cleanup', [
+		) );
+		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_url_cleanup', array(
 			'sanitize_callback' => 'absint',
-		] );
-		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_apply_css', [
+		) );
+		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_apply_css', array(
 			'sanitize_callback' => 'absint',
-		] );
-		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_apply_js', [
+		) );
+		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_apply_js', array(
 			'sanitize_callback' => 'absint',
-		] );
-		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_apply_images', [
+		) );
+		register_setting( 'of_cache_yamero_settings', 'of_cache_yamero_apply_images', array(
 			'sanitize_callback' => 'absint',
-		] );
+		) );
 	}
 	/**
 	 * 設定値を一括取得（キャッシュ対応）
@@ -125,7 +125,7 @@ class OF_Cache_Yamero {
 	private function of_get_cached_options() {
 		static $options = null;
 		if ( null === $options ) {
-			$options = [
+			$options = array(
 				'enabled'           => get_option( 'of_cache_yamero_enabled', false ),
 				'scope'             => get_option( 'of_cache_yamero_scope', 'admin_only' ),
 				'start_datetime'    => get_option( 'of_cache_yamero_start_datetime', '' ),
@@ -135,7 +135,7 @@ class OF_Cache_Yamero {
 				'apply_css'         => get_option( 'of_cache_yamero_apply_css', true ),
 				'apply_js'          => get_option( 'of_cache_yamero_apply_js', true ),
 				'apply_images'      => get_option( 'of_cache_yamero_apply_images', true ),
-			];
+			);
 		}
 		return $options;
 	}
@@ -288,11 +288,11 @@ class OF_Cache_Yamero {
 		wp_localize_script(
 			'cache-yamero',
 			'cacheYamero',
-			[
+			array(
 				'enabled'         => $this->of_is_enabled(),
 				'getFormSupport'  => (bool) get_option( 'of_cache_yamero_get_form_support', true ),
 				'urlCleanup'      => (bool) get_option( 'of_cache_yamero_url_cleanup', true ),
-			]
+			)
 		);
 	}
 	/**
@@ -348,16 +348,16 @@ class OF_Cache_Yamero {
 	 * リソースフックの初期化
 	 */
 	private function of_init_resource_hooks() {
-		$priority = apply_filters( 'cache_yamero_loader_priority', 10 );
-		add_filter( 'style_loader_src', [ $this, 'of_add_cache_param_to_style' ], $priority );
-		add_filter( 'script_loader_src', [ $this, 'of_add_cache_param_to_script' ], $priority );
-		add_filter( 'wp_get_attachment_url', [ $this, 'of_add_cache_param_to_attachment_url' ], $priority );
-		add_filter( 'wp_get_attachment_image_src', [ $this, 'of_add_cache_param_to_attachment_image_src' ], $priority );
-		add_filter( 'wp_get_attachment_image_url', [ $this, 'of_add_cache_param_to_attachment_url' ], $priority );
-		add_filter( 'wp_get_attachment_image_attributes', [ $this, 'of_add_cache_param_to_attachment_image_attributes' ], $priority, 3 );
-		add_filter( 'wp_calculate_image_srcset', [ $this, 'of_add_cache_param_to_image_srcset' ], $priority );
-		add_filter( 'the_content', [ $this, 'of_filter_content_images' ], $priority );
-		add_filter( 'post_thumbnail_html', [ $this, 'of_filter_thumbnail_images' ], $priority );
+		$priority = apply_filters( 'of_cache_yamero_loader_priority', 10 );
+		add_filter( 'style_loader_src', array( $this, 'of_add_cache_param_to_style' ), $priority );
+		add_filter( 'script_loader_src', array( $this, 'of_add_cache_param_to_script' ), $priority );
+		add_filter( 'wp_get_attachment_url', array( $this, 'of_add_cache_param_to_attachment_url' ), $priority );
+		add_filter( 'wp_get_attachment_image_src', array( $this, 'of_add_cache_param_to_attachment_image_src' ), $priority );
+		add_filter( 'wp_get_attachment_image_url', array( $this, 'of_add_cache_param_to_attachment_url' ), $priority );
+		add_filter( 'wp_get_attachment_image_attributes', array( $this, 'of_add_cache_param_to_attachment_image_attributes' ), $priority, 3 );
+		add_filter( 'wp_calculate_image_srcset', array( $this, 'of_add_cache_param_to_image_srcset' ), $priority );
+		add_filter( 'the_content', array( $this, 'of_filter_content_images' ), $priority );
+		add_filter( 'post_thumbnail_html', array( $this, 'of_filter_thumbnail_images' ), $priority );
 	}
 	/**
 	 * 現在のユーザーに対して有効かチェック
@@ -391,11 +391,11 @@ class OF_Cache_Yamero {
 			return $url;
 		}
 		if ( $resource_type ) {
-			$defaults = [
+			$defaults = array(
 				'css' => true,
 				'js' => true,
 				'images' => true,
-			];
+			);
 			$default_value = isset( $defaults[ $resource_type ] ) ? $defaults[ $resource_type ] : true;
 			if ( ! get_option( "of_cache_yamero_apply_{$resource_type}", $default_value ) ) {
 				return $url;
@@ -408,7 +408,7 @@ class OF_Cache_Yamero {
 		if ( ! $parsed ) {
 			return $url;
 		}
-		$query_args = [];
+		$query_args = array();
 		if ( ! empty( $parsed['query'] ) ) {
 			wp_parse_str( $parsed['query'], $query_args );
 		}
@@ -440,7 +440,7 @@ class OF_Cache_Yamero {
 			return $srcset;
 		}
 		$sources = explode( ',', $srcset );
-		$updated_sources = [];
+		$updated_sources = array();
 		foreach ( $sources as $source ) {
 			$source = trim( $source );
 			if ( empty( $source ) ) {
@@ -462,7 +462,7 @@ class OF_Cache_Yamero {
 		if ( empty( $html ) || ! $this->of_is_active_for_current_user() ) {
 			return $html;
 		}
-		$lazy_attrs = [ 'data-src', 'data-srcset', 'data-original', 'data-lazy', 'data-lazy-src' ];
+		$lazy_attrs = array( 'data-src', 'data-srcset', 'data-original', 'data-lazy', 'data-lazy-src' );
 		foreach ( $lazy_attrs as $attr ) {
 			$html = preg_replace_callback(
 				'/(<(?:img|source)[^>]*\s' . preg_quote( $attr, '/' ) . '=")([^"]+)(")/i',
@@ -566,7 +566,7 @@ class OF_Cache_Yamero {
 	 * @return string 検証済みスコープ値
 	 */
 	private function validate_scope( $scope ) {
-		$allowed_scopes = [ 'admin_only', 'all_visitors' ];
+		$allowed_scopes = array( 'admin_only', 'all_visitors' );
 		return in_array( $scope, $allowed_scopes, true ) ? $scope : 'admin_only';
 	}
 	/**
@@ -618,83 +618,91 @@ class OF_Cache_Yamero {
 		// 状態判定の優先順位
 		if ( ! $enabled ) {
 			// 有効チェックOFF
-			return [
+			return array(
 				'bg' => 'black',
 				'label' => $is_english ? 'Disabled' : '無効',
 				'status' => 'disabled'
-			];
+			);
 		}
 
 		if ( $end_ts && $now >= $end_ts ) {
 			// 有効チェックON かつ 終了時刻を過ぎている
-			return [
+			return array(
 				'bg' => 'black',
 				'label' => $is_english ? 'Ended' : '終了',
 				'status' => 'ended'
-			];
+			);
 		}
 
 		if ( $start_ts && $now < $start_ts ) {
 			// 有効チェックON かつ 開始時刻前
-			return [
+			return array(
 				'bg' => 'red',
 				'label' => $is_english ? 'Pending' : '待機',
 				'status' => 'pending'
-			];
+			);
 		}
 
 		// 上記以外（有効状態）
-		return [
+		return array(
 			'bg' => 'red',
 			'label' => $is_english ? 'Active' : '有効',
 			'status' => 'active'
-		];
+		);
 	}
 
 	/**
-	 * 管理メニューを装飾（バッジ付与）
+	 * 管理メニューDOM装飾用JS出力
 	 */
 	public function of_decorate_admin_menu() {
-		global $submenu, $menu;
-
 		// 管理画面以外では何もしない
 		if ( ! is_admin() ) {
 			return;
 		}
 
+		add_action( 'admin_footer', array( $this, 'of_admin_footer_menu_decorator' ) );
+	}
+
+	/**
+	 * admin_footerでDOM装飾用JavaScriptを出力
+	 */
+	public function of_admin_footer_menu_decorator() {
 		$state = $this->of_get_admin_menu_state();
 
-		// 親メニュー「設定」にドット追加（active/pending時のみ）
-		if ( isset( $menu ) && is_array( $menu ) && in_array( $state['status'], [ 'active', 'pending' ], true ) ) {
-			foreach ( $menu as $key => $menu_item ) {
-				if ( isset( $menu_item[2] ) && 'options-general.php' === $menu_item[2] ) {
-					// 既にドットが含まれている場合は二重で追加しない
-					if ( false === strpos( $menu_item[0], 'cy-state-dot' ) ) {
-						$dot_html = '<span class="cy-state-dot" data-status="' . esc_attr( $state['status'] ) . '"></span>';
-						$screen_reader_html = '<span class="screen-reader-text">Cache Yamero: ' . esc_html( $state['label'] ) . '</span>';
-						$menu[ $key ][0] .= $dot_html . $screen_reader_html;
-					}
-					break;
+		// 翻訳対応のスクリーンリーダー文字列
+		$screen_reader_text = sprintf(
+			/* translators: %s: Cache Yamero status label */
+			__( 'Cache Yamero: %s', 'cache-yamero' ),
+			$state['label']
+		);
+		?>
+		<script type="text/javascript">
+		(function() {
+			'use strict';
+
+			var state = <?php echo wp_json_encode( $state ); ?>;
+			var screenReaderText = <?php echo wp_json_encode( $screen_reader_text ); ?>;
+
+			// 親メニュー「設定」にドット追加（active/pending時のみ）
+			if (state.status === 'active' || state.status === 'pending') {
+				var settingsMenu = document.querySelector('#adminmenu .menu-top a[href="options-general.php"]');
+				if (settingsMenu && !settingsMenu.querySelector('.cy-state-dot')) {
+					var dotHtml = '<span class="cy-state-dot" data-status="' + state.status + '"></span>';
+					var srHtml = '<span class="screen-reader-text">' + screenReaderText + '</span>';
+					settingsMenu.insertAdjacentHTML('beforeend', dotHtml + srHtml);
 				}
 			}
-		}
 
-		// 子メニュー「Cache Yamero」にバッジ追加（既存処理）
-		if ( ! isset( $submenu['options-general.php'] ) || ! is_array( $submenu['options-general.php'] ) ) {
-			return;
-		}
-
-		// cache-yamero のメニュー項目を検索
-		foreach ( $submenu['options-general.php'] as $key => $menu_item ) {
-			if ( isset( $menu_item[2] ) && 'cache-yamero' === $menu_item[2] ) {
-				// 既にバッジが含まれている場合は二重で追加しない
-				if ( false === strpos( $menu_item[0], 'cy-badge' ) ) {
-					$badge_html = '<span class="cy-badge" data-status="' . esc_attr( $state['status'] ) . '"><span class="cy-badge-text">' . esc_html( $state['label'] ) . '</span></span>';
-					$submenu['options-general.php'][ $key ][0] .= $badge_html;
-				}
-				break;
+			// 子メニュー「Cache Yamero」にバッジ追加
+			var cacheYameroMenu = document.querySelector('#adminmenu .settings_page_cache-yamero a');
+			if (cacheYameroMenu && !cacheYameroMenu.querySelector('.cy-badge')) {
+				var badgeHtml = '<span class="cy-badge" data-status="' + state.status + '">' +
+					'<span class="cy-badge-text">' + state.label + '</span></span>';
+				cacheYameroMenu.insertAdjacentHTML('beforeend', badgeHtml);
 			}
-		}
+		})();
+		</script>
+		<?php
 	}
 
 	/**

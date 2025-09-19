@@ -95,14 +95,39 @@
 		return false;
 	}
 
+	// 親要素を辿ってアンカーを取得（closest()のフォールバック対応）
+	function findClosestAnchor(element) {
+		var current = element;
+		while (current && current !== document) {
+			if (current.tagName === 'A') {
+				return current;
+			}
+			current = current.parentElement;
+		}
+		return null;
+	}
+
 	// クリックハンドラ
 	function handleClick(event) {
 		try {
-			if (shouldExcludeLink(event.target, event)) {
+			// closest('a')でアンカーを取得（未サポート時は親を辿るフォールバック）
+			var anchor;
+			if (event.target.closest && typeof event.target.closest === 'function') {
+				anchor = event.target.closest('a');
+			} else {
+				anchor = findClosestAnchor(event.target);
+			}
+
+			// アンカーがなければ何もしない
+			if (!anchor) {
 				return;
 			}
 
-			var href = event.target.getAttribute('href');
+			if (shouldExcludeLink(anchor, event)) {
+				return;
+			}
+
+			var href = anchor.getAttribute('href');
 			if (!href || !isSameOrigin(href)) {
 				return;
 			}
