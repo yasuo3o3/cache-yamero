@@ -709,23 +709,35 @@ class OF_Cache_Yamero {
 
 			var state = <?php echo wp_json_encode( $state ); ?>;
 			var screenReaderText = <?php echo wp_json_encode( $screen_reader_text ); ?>;
+			var srClass = 'cy-screen-reader-text';
 
-			// 親メニュー「設定」にドット追加（active/pending時のみ）
-			if (state.status === 'active' || state.status === 'pending') {
-				var settingsMenu = document.querySelector('#adminmenu .menu-top a[href="options-general.php"]');
-				if (settingsMenu && !settingsMenu.querySelector('.cy-state-dot')) {
-					var dotHtml = '<span class="cy-state-dot" data-status="' + state.status + '"></span>';
-					var srHtml = '<span class="screen-reader-text">' + screenReaderText + '</span>';
-					settingsMenu.insertAdjacentHTML('beforeend', dotHtml + srHtml);
+			var settingsMenuName = document.querySelector('#menu-settings > a .wp-menu-name');
+			if (settingsMenuName && (state.status === 'active' || state.status === 'pending')) {
+				if (!settingsMenuName.querySelector('.cy-state-dot')) {
+					var dot = document.createElement('span');
+					dot.className = 'cy-state-dot';
+					dot.setAttribute('data-status', state.status);
+					dot.setAttribute('aria-hidden', 'true');
+					settingsMenuName.appendChild(dot);
+				}
+				if (!settingsMenuName.querySelector('.' + srClass)) {
+					var sr = document.createElement('span');
+					sr.className = 'screen-reader-text ' + srClass;
+					sr.textContent = screenReaderText;
+					settingsMenuName.appendChild(sr);
 				}
 			}
 
-			// 子メニュー「Cache Yamero」にバッジ追加
-			var cacheYameroMenu = document.querySelector('#adminmenu .settings_page_cache-yamero a');
-			if (cacheYameroMenu && !cacheYameroMenu.querySelector('.cy-badge')) {
-				var badgeHtml = '<span class="cy-badge" data-status="' + state.status + '">' +
-					'<span class="cy-badge-text">' + state.label + '</span></span>';
-				cacheYameroMenu.insertAdjacentHTML('beforeend', badgeHtml);
+			var submenuName = document.querySelector('#adminmenu .settings_page_cache-yamero > a .wp-menu-name');
+			if (submenuName && !submenuName.querySelector('.cy-badge')) {
+				var badge = document.createElement('span');
+				badge.className = 'cy-badge';
+				badge.setAttribute('data-status', state.status);
+				var badgeText = document.createElement('span');
+				badgeText.className = 'cy-badge-text';
+				badgeText.textContent = state.label;
+				badge.appendChild(badgeText);
+				submenuName.appendChild(badge);
 			}
 		})();
 		</script>
@@ -746,11 +758,12 @@ class OF_Cache_Yamero {
 		echo '<style type="text/css">';
 
 		// バッジのベースCSS（常時出力）
-		echo '.cy-badge{display:inline-block;margin-left:.4em;padding:.08em .45em;border-radius:1em;font-size:11px;line-height:1.9;}';
-		echo '#adminmenu .settings_page_cache-yamero .cy-badge{vertical-align:middle;}';
+		echo '#adminmenu #menu-settings > a .wp-menu-name, #adminmenu .settings_page_cache-yamero > a .wp-menu-name{display:inline-flex;align-items:center;gap:.45em;white-space:nowrap;}';
+		echo '.cy-badge{display:inline-flex;align-items:center;margin-left:.4em;padding:.08em .45em;border-radius:1em;font-size:11px;line-height:1.9;flex-shrink:0;}';
+		echo '.cy-badge-text{display:inline-block;}';
 
 		// 親ドットのベースCSS
-		echo '#adminmenu .menu-top > a .cy-state-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-left:.5em;vertical-align:middle;}';
+		echo '#adminmenu #menu-settings > a .wp-menu-name .cy-state-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-left:.3em;flex-shrink:0;}';
 
 		// 新仕様の配色マップ（バッジ）
 		echo '.cy-badge[data-status="active"]{background:#d63638;color:#fff;}';
