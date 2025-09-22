@@ -430,16 +430,6 @@ class OF_Cache_Yamero {
 		}
 		return $this->of_is_within_datetime_range();
 	}
-	$enabled = get_option( 'of_cache_yamero_enabled', false );
-	if ( ! $enabled ) {
-		return false;
-	}
-	$scope = get_option( 'of_cache_yamero_scope', 'admin_only' );
-	if ( 'admin_only' === $scope && ! current_user_can( 'manage_options' ) ) {
-		return false;
-	}
-	return $this->of_is_within_datetime_range();
-}
 	/**
 	 * リクエスト共通のタイムスタンプを取得
 	 */
