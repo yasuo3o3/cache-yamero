@@ -317,7 +317,7 @@ class OF_Cache_Yamero {
 	 * フロントエンドスクリプトを読み込む
 	 */
 	public function of_enqueue_scripts() {
-		if ( is_admin() || ! $this->of_should_load_script() ) {
+			if ( is_admin() || ! $this->of_should_load_script() ) {
 			return;
 		}
 		wp_enqueue_script(
@@ -414,16 +414,20 @@ class OF_Cache_Yamero {
 	 * 現在のユーザーに対して有効かチェック
 	 */
 	private function of_is_active_for_current_user() {
-		$enabled = get_option( 'of_cache_yamero_enabled', false );
-		if ( ! $enabled ) {
-			return false;
-		}
-		$scope = get_option( 'of_cache_yamero_scope', 'admin_only' );
-		if ( 'admin_only' === $scope && ! current_user_can( 'manage_options' ) ) {
-			return false;
-		}
-		return $this->of_is_within_datetime_range();
+		// Skip cache busting inside wp-admin.
+		if ( is_admin() && ! wp_doing_ajax() && ! wp_doing_rest() ) {
+		return false;
 	}
+	$enabled = get_option( 'of_cache_yamero_enabled', false );
+	if ( ! $enabled ) {
+		return false;
+	}
+	$scope = get_option( 'of_cache_yamero_scope', 'admin_only' );
+	if ( 'admin_only' === $scope && ! current_user_can( 'manage_options' ) ) {
+		return false;
+	}
+	return $this->of_is_within_datetime_range();
+}
 	/**
 	 * リクエスト共通のタイムスタンプを取得
 	 */
@@ -845,3 +849,4 @@ class OF_Cache_Yamero {
 		echo '</style>';
 	}
 }
+
