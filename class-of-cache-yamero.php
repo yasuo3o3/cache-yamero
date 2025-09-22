@@ -414,9 +414,21 @@ class OF_Cache_Yamero {
 	 * 現在のユーザーに対して有効かチェック
 	 */
 	private function of_is_active_for_current_user() {
-		// Skip cache busting inside wp-admin.
-		if ( is_admin() && ! wp_doing_ajax() && ! wp_doing_rest() ) {
-		return false;
+		// Skip cache busting inside wp-admin for standard page loads.
+		$is_ajax = function_exists( 'wp_doing_ajax' ) ? wp_doing_ajax() : ( defined( 'DOING_AJAX' ) && DOING_AJAX );
+		$is_rest = function_exists( 'wp_doing_rest' ) ? wp_doing_rest() : ( defined( 'REST_REQUEST' ) && REST_REQUEST );
+		if ( is_admin() && ! $is_ajax && ! $is_rest ) {
+			return false;
+		}
+		$enabled = get_option( 'of_cache_yamero_enabled', false );
+		if ( ! $enabled ) {
+			return false;
+		}
+		$scope = get_option( 'of_cache_yamero_scope', 'admin_only' );
+		if ( 'admin_only' === $scope && ! current_user_can( 'manage_options' ) ) {
+			return false;
+		}
+		return $this->of_is_within_datetime_range();
 	}
 	$enabled = get_option( 'of_cache_yamero_enabled', false );
 	if ( ! $enabled ) {
