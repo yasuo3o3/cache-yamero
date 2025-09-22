@@ -170,7 +170,7 @@ docs/   export-ignore
 # Claude Code specific
 .claude/    export-ignore
 .history/   export-ignore
-
+zips/    export-ignore
 debug-tools/    export-ignore
 
 .gitignore export-ignore
