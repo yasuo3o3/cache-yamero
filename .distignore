@@ -1,29 +1,36 @@
-# Distignore for WordPress.org SVN deployment
-# This file specifies files and directories to exclude from the plugin ZIP
-# when deploying to WordPress.org plugin directory via SVN
+# ===== 共通 =====
 
-# Version control
+# WordPress.org SVN配布除外設定
+# プラグインZIPから除外するファイル・ディレクトリを指定
+
+# バージョン管理
 .git/
 .svn/
 .gitignore
 .gitattributes
 .distignore
 
-# Build tools and dependencies
+# 開発ツール・依存関係
+vendor/
+composer.json
+composer.lock
 node_modules/
 package.json
 package-lock.json
 yarn.lock
-composer.json
-composer.lock
-vendor/
+.npmrc
+.yarnrc
+
+# ビルドツール
 Gruntfile.js
 gulpfile.js
 webpack.config.js
 rollup.config.js
 vite.config.js
+turbo.json
+lerna.json
 
-# Development assets and source files
+# 開発アセット・ソースファイル
 src/
 dev/
 development/
@@ -34,43 +41,50 @@ less/
 *.sass
 *.less
 
-# Build outputs that shouldn't be distributed
+# ビルド成果物
 build/
 dist/
 .cache/
+zips/
 
-# Documentation (development specific)
-CHANGELOG.md
-CONTRIBUTING.md
-DEVELOPER.md
-TESTING.md
-TODO.md
-docs/
-doc/
-
-# Testing
+# テスト関連
 tests/
 test/
 spec/
 phpunit.xml
 phpunit.xml.dist
 .phpunit.result.cache
+jest.config.js
+karma.conf.js
 *.test.js
 *.spec.js
+fixtures/
+__tests__/
+__mocks__/
 
-# Code quality tools
-.eslintrc
-.eslintrc.js
-.eslintrc.json
-.jshintrc
-.stylelintrc
-.stylelintrc.json
+# PHP品質ツール
 phpcs.xml
 phpcs.xml.dist
 .phpcs.xml
-.editorconfig
+phpstan.neon
+phpstan-bootstrap.php
+.php-cs-fixer.cache
 
-# IDE and Editor files
+# JavaScript品質ツール
+.eslintrc
+.eslintrc.js
+.eslintrc.json
+.eslintignore
+.jshintrc
+.stylelintrc
+.stylelintrc.json
+.stylelintignore
+.prettierrc
+.prettierrc.js
+.prettierrc.json
+.prettierignore
+
+# IDE・エディタ
 .vscode/
 .idea/
 *.sublime-project
@@ -79,8 +93,9 @@ phpcs.xml.dist
 *.swp
 *.swo
 *~
+.editorconfig
 
-# OS generated files
+# OS・システム生成ファイル
 .DS_Store
 .DS_Store?
 ._*
@@ -97,8 +112,10 @@ desktop.ini
 .circleci/
 .codecov.yml
 appveyor.yml
+codecov.yml
+sonar-project.properties
 
-# Logs and temporary files
+# ログ・テンポラリファイル
 *.log
 logs/
 npm-debug.log*
@@ -110,24 +127,23 @@ tmp/
 temp/
 cache/
 
-# Archives
+# アーカイブ・バックアップ
 *.zip
 *.tar
 *.tar.gz
 *.rar
 *.7z
-
-# Backup files
 *.bak
 *.backup
 *~
 
-# WordPress specific development files
+# WordPress開発関連
 wp-cli.yml
 wp-config-sample.php
 wp-config-local.php
+local-config.php
 
-# Environment and security files
+# セキュリティ・環境ファイル
 .env
 .env.*
 *.pem
@@ -136,81 +152,80 @@ wp-config-local.php
 .htaccess
 .htpasswd
 
-# SVN specific (WordPress.org structure)
+# SVN構造（WordPress.org）
 tags/
 branches/
 trunk/
 
-# Plugin development specific
+# 開発ツール・スクリプト
 debug-tools/
 development-tools/
 build-tools/
+bin/
+scripts/
 
-# Minified files that have source maps
+# ソースマップ
 *.min.js.map
 *.min.css.map
 *.css.map
 *.js.map
-
-# Source maps
 *.map
 
-# Lock files
+# ロックファイル
 *.lock
 
-# Temporary build files
+# テンポラリビルドファイル
 *.tmp
 *.temp
 
-# Coverage reports
+# カバレッジレポート
 coverage/
 *.lcov
 .nyc_output
 
-# Editor configs
-.editorconfig
-
-# Linting configs
-.eslintignore
-.stylelintignore
-
-# Node.js
+# Node.js関連
 .npm
 .node_repl_history
-
-# Yarn
 .yarn-integrity
 
-# Development scripts
-scripts/dev/
-scripts/development/
-scripts/build/
-
-# Test fixtures
-fixtures/
-__tests__/
-__mocks__/
-
-# Docker
+# Docker・仮想化
 Dockerfile
 docker-compose.yml
 .dockerignore
-
-# Vagrant
 Vagrantfile
 .vagrant/
 
-# Local development
-local-config.php
-wp-config-local.php
+# Git hooks・ツール設定
+.huskyrc
+.commitlintrc
+.commitlintrc.js
+.commitlintrc.json
+renovate.json
+dependabot.yml
 
-# Claude Code specific
+# ドキュメント（開発用）
+CHANGELOG.md
+CONTRIBUTING.md
+DEVELOPER.md
+TESTING.md
+TODO.md
+README.md
+SECURITY.md
+REPORT.md
+VERSION-UP.md
+docs/
+doc/
+
+# Claude Code関連
 .claude/
 .history/
 CLAUDE.md
 REVIEW.md
 NETSERVICE.md
 WORDPRESS.md
+AGENTS.md
+YASUO3O3.md
 LICENSE
 
-build/
+# ===== cache-yamero 専用 =====
+# （プラグイン固有のルールをここに追加）
